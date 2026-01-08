@@ -62,6 +62,10 @@ async function initApp() {
                 pixelArt: true,
                 roundPixels: true
             },
+            fps: {
+                target: 165,
+                forceSetTimeOut: false
+            },
             scene: [BootScene, GameScene]
         };
 
