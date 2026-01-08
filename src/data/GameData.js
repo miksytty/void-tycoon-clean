@@ -1,13 +1,13 @@
 
 export const RESOURCES = {
-    wood: { id: 'wood', name: 'Дерево', icon: '🪵', color: 0x8B4513 },
-    hardwood: { id: 'hardwood', name: 'Брус', icon: '🟫', color: 0x5D4037 },
-    iron: { id: 'iron', name: 'Железо', icon: '🔩', color: 0x708090 },
-    steel: { id: 'steel', name: 'Сталь', icon: '🏗️', color: 0x455A64 },
-    crystal: { id: 'crystal', name: 'Кристалл', icon: '💎', color: 0x9932CC },
-    chip: { id: 'chip', name: 'Микрочип', icon: '💾', color: 0x2E7D32 },
-    quantum: { id: 'quantum', name: 'Ядро Пустоты', icon: '⚛️', color: 0x00BCD4 },
-    dimension_key: { id: 'dimension_key', name: 'Ключ Измерений', icon: '🗝️', color: 0xFFD700 }
+    wood: { id: 'wood', name: 'Дерево', icon: '🪵', color: 0x8B4513, description: 'Основной строительный материал.' },
+    hardwood: { id: 'hardwood', name: 'Брус', icon: '🟫', color: 0x5D4037, description: 'Обработанное дерево для зданий.' },
+    iron: { id: 'iron', name: 'Железо', icon: '🔩', color: 0x708090, description: 'Металл для инструментов.' },
+    steel: { id: 'steel', name: 'Сталь', icon: '🏗️', color: 0x455A64, description: 'Прочный сплав.' },
+    crystal: { id: 'crystal', name: 'Кристалл', icon: '💎', color: 0x9932CC, description: 'Магический минерал.' },
+    chip: { id: 'chip', name: 'Микрочип', icon: '💾', color: 0x2E7D32, description: 'Высокие технологии.' },
+    quantum: { id: 'quantum', name: 'Ядро Пустоты', icon: '⚛️', color: 0x00BCD4, description: 'Энергия из других миров.' },
+    dimension_key: { id: 'dimension_key', name: 'Ключ Измерений', icon: '🗝️', color: 0xFFD700, description: 'Открывает Портал. Выпал из Босса.' }
 };
 
 export const TOOLS = {

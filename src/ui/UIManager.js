@@ -278,12 +278,40 @@ export class UIManager {
                     ${item.quantity > 1 ? `<span class="item-count">${item.quantity}</span>` : ''}
                 `;
 
-                // Клик для использования
-                slot.addEventListener('click', () => this.useItem(i));
+                // Клик для использования или просмотра
+                slot.addEventListener('click', () => this.handleItemClick(i));
             }
 
             grid.appendChild(slot);
         }
+    }
+
+    /**
+     * Обработка клика по предмету
+     */
+    handleItemClick(slotIndex) {
+        const storage = window.VoidTycoon.storage;
+        const item = storage.getInventory()[slotIndex];
+
+        if (!item) return;
+
+        // Если это ресурс или обычный предмет без эффекта - показываем инфо
+        if (item.type === 'resource' || !item.effect) {
+            // Попробуем найти описание в RESOURCES (если это ресурс) или в самом предмете
+            let desc = item.description;
+
+            if (!desc && item.type === 'resource' && RESOURCES[item.id]) {
+                desc = RESOURCES[item.id].description;
+            }
+
+            if (!desc) desc = 'Предмет';
+
+            this.showNotification(`ℹ️ ${item.name}: ${desc}`, 'info');
+            return;
+        }
+
+        // Если расходуемый предмет с эффектом - используем
+        this.useItem(slotIndex);
     }
 
     /**
