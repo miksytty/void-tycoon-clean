@@ -357,8 +357,9 @@ export class GameScene extends Phaser.Scene {
 
         this.gameTime += delta * 0.0001;
         const cycle = Math.sin(this.gameTime);
-        const darkness = Phaser.Math.Clamp(Math.max(0, -cycle * 0.7), 0, 0.7);
-        if (this.dayNightOverlay) this.dayNightOverlay.fillAlpha = darkness;
+        // OPTIMIZATION: Temporarily disabled Day/Night cycle visual update to check performance
+        // const darkness = Phaser.Math.Clamp(Math.max(0, -cycle * 0.7), 0, 0.7);
+        // if (this.dayNightOverlay) this.dayNightOverlay.fillAlpha = darkness;
 
         const distMoved = Phaser.Math.Distance.Between(
             this.player.x, this.player.y,
@@ -410,6 +411,12 @@ export class GameScene extends Phaser.Scene {
         if (time > this.lastIncomeTime + 1000) {
             this.processPassiveIncome();
             this.lastIncomeTime = time;
+        }
+
+        // OPTIMIZATION: Update HUD less frequently (e.g. every 500ms)
+        if (!this.lastHudUpdate || time > this.lastHudUpdate + 500) {
+            this.updateHUD();
+            this.lastHudUpdate = time;
         }
 
         this.updateBosses();
