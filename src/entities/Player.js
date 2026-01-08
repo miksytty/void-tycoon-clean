@@ -60,6 +60,20 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
      * Обновление игрока
      */
     update(cursors, wasd, joystick) {
+        // Calculate Speed with Skill Bonus
+        const baseSpeed = this.speed;
+        let speedMult = 1;
+
+        try {
+            const skillLevel = window.VoidTycoon.storage.getSkillLevel('speed');
+            if (skillLevel > 0) {
+                // +10% per level
+                speedMult += skillLevel * 0.1;
+            }
+        } catch (e) { }
+
+        const finalSpeed = baseSpeed * speedMult;
+
         let vx = 0;
         let vy = 0;
 
@@ -84,7 +98,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         }
 
         // Применение скорости
-        this.setVelocity(vx * this.speed, vy * this.speed);
+        this.setVelocity(vx * finalSpeed, vy * finalSpeed);
 
         // Анимация
         this.isMoving = vx !== 0 || vy !== 0;

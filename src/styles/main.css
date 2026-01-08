@@ -699,3 +699,87 @@ body {
         display: flex;
     }
 }
+
+/* Skills Modal Styles */
+.skills-modal {
+    max-width: 600px;
+}
+
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    padding: 10px 0;
+}
+
+.skill-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.skill-card.maxed {
+    border-color: var(--accent-gold);
+    background: rgba(253, 203, 110, 0.1);
+}
+
+.skill-icon {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.skill-info h3 {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.skill-level {
+    font-size: 0.8rem;
+    color: var(--tg-theme-hint-color);
+    background: rgba(0, 0, 0, 0.3);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.skill-effect {
+    font-size: 0.9rem;
+    color: var(--accent-green);
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+.upgrade-btn {
+    margin-top: auto;
+    width: 100%;
+    padding: 10px;
+    background: var(--tg-theme-button-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.upgrade-btn.disabled {
+    background: rgba(255, 255, 255, 0.1);
+    color: #888;
+    cursor: not-allowed;
+}
+
+.max-badge {
+    text-align: center;
+    font-weight: bold;
+    color: var(--accent-gold);
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}

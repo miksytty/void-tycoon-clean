@@ -266,6 +266,45 @@ export const BUILDINGS = {
     }
 };
 
+export const SKILLS = {
+    speed: {
+        id: 'speed',
+        name: 'Скороход',
+        icon: '⚡',
+        description: 'Увеличивает скорость бега',
+        maxLevel: 5,
+        costPerLevel: { resource: 'wood', amount: 50, growth: 2.0 }, // 50, 100, 200...
+        effect: { type: 'speed_mult', value: 0.1 } // +10% per level
+    },
+    efficiency: {
+        id: 'efficiency',
+        name: 'Острый глаз',
+        icon: '👁️',
+        description: 'Больше ресурсов при добыче',
+        maxLevel: 5,
+        costPerLevel: { resource: 'iron', amount: 30, growth: 2.0 },
+        effect: { type: 'yield_mult', value: 0.2 } // +20% per level
+    },
+    backpack: {
+        id: 'backpack',
+        name: 'Рюкзак',
+        icon: '🎒',
+        description: 'Макс. энергия +10',
+        maxLevel: 5,
+        costPerLevel: { resource: 'wood', amount: 100, growth: 1.5 },
+        effect: { type: 'energy_add', value: 10 } // +10 energy per level
+    },
+    luck: {
+        id: 'luck',
+        name: 'Удача',
+        icon: '🍀',
+        description: 'Шанс крита x2',
+        maxLevel: 3,
+        costPerLevel: { resource: 'crystal', amount: 10, growth: 2.0 },
+        effect: { type: 'crit_chance_add', value: 0.05 } // +5% crit chance
+    }
+};
+
 export const SHOP_ITEMS = [
     {
         id: 'starter_pack',

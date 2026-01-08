@@ -6,9 +6,11 @@
  */
 
 import { RECIPES, TOOLS, SHOP_ITEMS, RESOURCES, BUILDINGS, ACHIEVEMENTS, QUEST_TEMPLATES } from '../data/GameData.js';
+import { SkillsUI } from './SkillsUI.js';
 
 export class UIManager {
     constructor() {
+        this.skillsUI = new SkillsUI(this);
         this.modals = {
             inventory: document.getElementById('inventory-modal'),
             shop: document.getElementById('shop-modal'),
@@ -61,6 +63,16 @@ export class UIManager {
         // Магазин
         document.getElementById('btn-shop')?.addEventListener('click', () => {
             this.openModal('shop');
+        });
+
+        // Навыки
+        document.getElementById('btn-skills')?.addEventListener('click', () => {
+            if (!this.skills) {
+                const { SkillsUI } = require('./SkillsUI.js'); // Assuming bundling handles this, or use top-level import
+                // Let's assume we import at top-level
+            }
+            // For now, assume it's attached to window or imported
+            window.VoidTycoon.ui.skillsUI.show();
         });
 
         // Настройки

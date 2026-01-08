@@ -278,7 +278,13 @@ export class GameScene extends Phaser.Scene {
             return;
         }
 
-        const amount = Math.floor(reward.amount * currentTool.efficiency);
+        let efficiencyMult = currentTool.efficiency;
+        try {
+            const skillLevel = window.VoidTycoon.storage.getSkillLevel('efficiency');
+            if (skillLevel > 0) efficiencyMult += skillLevel * 0.2; // +20% per level
+        } catch (e) { }
+
+        const amount = Math.floor(reward.amount * efficiencyMult);
 
         storage.addResource(reward.type, amount);
         storage.addXP(reward.xp);
@@ -505,7 +511,14 @@ export class GameScene extends Phaser.Scene {
             if (dist < 60) {
                 // Critical Hit Chance
                 let finalDamage = damage;
-                let isCrit = Math.random() < 0.2; // 20% Crit chance
+
+                let critChance = 0.2; // Base 20%
+                try {
+                    const skillLevel = window.VoidTycoon.storage.getSkillLevel('luck');
+                    if (skillLevel > 0) critChance += skillLevel * 0.05; // +5% per level
+                } catch (e) { }
+
+                let isCrit = Math.random() < critChance;
                 if (isCrit) finalDamage *= 2;
 
                 boss.takeDamage(finalDamage);
