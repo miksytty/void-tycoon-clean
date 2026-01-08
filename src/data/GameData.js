@@ -263,6 +263,18 @@ export const BUILDINGS = {
         costMultiplier: 1,
         production: {},
         maxLevel: 1
+    },
+    turret: {
+        id: 'turret',
+        name: 'Турель',
+        description: 'Атакует врагов',
+        icon: '🛡️',
+        baseCost: { wood: 100, iron: 50 },
+        costMultiplier: 1.5,
+        production: {}, // No passive resource
+        maxLevel: 10,
+        type: 'defense',
+        stats: { damage: 10, range: 200, fireRate: 1000 } // Custom stats
     }
 };
 

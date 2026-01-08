@@ -611,6 +611,11 @@ export class UIManager {
         storage.data.buildings[buildingId] = (storage.data.buildings[buildingId] || 0) + 1;
         storage.save();
 
+        if (buildingId === 'turret') {
+            const scene = window.VoidTycoon.game?.scene?.getScene('GameScene');
+            scene?.loadBuiltTurrets();
+        }
+
         // Проверка победы
         if (buildingId === 'portal') {
             this.showWinScreen();

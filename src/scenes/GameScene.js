@@ -5,6 +5,7 @@ import { WorldGenerator } from '../systems/WorldGenerator.js';
 import { ResourceManager } from '../systems/ResourceManager.js';
 import { TOOLS, RESOURCES, BUILDINGS, BOSSES, MOBS } from '../data/GameData.js';
 import { VirtualJoystick } from '../ui/VirtualJoystick.js';
+import { Turret } from '../entities/Turret.js';
 
 export class GameScene extends Phaser.Scene {
     constructor() {
@@ -18,6 +19,7 @@ export class GameScene extends Phaser.Scene {
         this.currentResource = null;
         this.lastIncomeTime = 0;
         this.bosses = [];
+        this.turrets = [];
         this.lastBossSpawnCheck = 0;
     }
 
@@ -51,6 +53,29 @@ export class GameScene extends Phaser.Scene {
         this.time.delayedCall(1500, () => {
             window.VoidTycoon.dailyRewards?.checkDailyReward();
         });
+
+        this.loadBuiltTurrets();
+    }
+
+    loadBuiltTurrets() {
+        const storage = window.VoidTycoon.storage;
+        const buildings = storage.data.buildings || {};
+        const turretCount = buildings['turret'] || 0;
+
+        // Reset current
+        this.turrets.forEach(t => t.destroy());
+        this.turrets = [];
+
+        // Spawn in circle around (0,0) - The "Base"
+        for (let i = 0; i < turretCount; i++) {
+            const angle = (i * (360 / Math.max(1, turretCount))) * (Math.PI / 180);
+            const dist = 80;
+            const tx = Math.cos(angle) * dist;
+            const ty = Math.sin(angle) * dist;
+
+            const t = new Turret(this, tx, ty, 1); // Default level 1 for now
+            this.turrets.push(t);
+        }
     }
 
     setupInput() {
@@ -436,6 +461,9 @@ export class GameScene extends Phaser.Scene {
         }
 
         this.updateBosses();
+
+        // Update Turrets
+        this.turrets.forEach(turret => turret.update(time, this.bosses));
 
         if (time > this.lastBossSpawnCheck + 5000) {
             this.trySpawnBoss();
