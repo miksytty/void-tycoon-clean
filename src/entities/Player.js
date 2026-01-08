@@ -16,7 +16,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         scene.physics.add.existing(this);
 
         // Настройки
-        this.speed = 180;
+        this.speed = 240;
         this.setCollideWorldBounds(false); // Бесконечный мир
         this.setDepth(100);
 

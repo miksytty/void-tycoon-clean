@@ -33,7 +33,7 @@ export class GameScene extends Phaser.Scene {
 
         this.player = new Player(this, 0, 0);
 
-        this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
+        this.cameras.main.startFollow(this.player, true, 0.2, 0.2);
         this.cameras.main.setZoom(1);
 
         this.worldGenerator.generateAroundPlayer();

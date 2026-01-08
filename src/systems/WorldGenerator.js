@@ -43,7 +43,8 @@ export class WorldGenerator {
         const chunkData = { tiles: [], resources: [] };
 
         // Determine Biome
-        const biome = this.getBiome(chunkX, chunkY);
+        // Determine Biome using approximate center of chunk
+        const biome = this.getBiome(worldX + this.chunkSize / 2, worldY + this.chunkSize / 2);
 
         for (let tx = 0; tx < tilesPerChunk; tx++) {
             for (let ty = 0; ty < tilesPerChunk; ty++) {
@@ -76,63 +77,51 @@ export class WorldGenerator {
         this.loadedChunks.set(`${chunkX},${chunkY}`, chunkData);
     }
 
-    getBiome(chunkX, chunkY) {
-        const n = this.noise(chunkX * 0.1, chunkY * 0.1); // Low frequency noise
-        if (n < 0.3) return 'wasteland';
-        if (n > 0.6) return 'crystal';
-        return 'forest'; // Default
-    }
+    // Radial Biome System
+    getBiome(x, y) {
+        // Distance from spawn (0,0)
+        const distance = Math.sqrt(x * x + y * y);
 
-    generateResourcesInChunk(chunkX, chunkY, worldX, worldY, chunkData, biome) {
-        const padding = 40;
-
-        if (chunkX === 0 && chunkY === 0) {
-            // Spawn area logic stays same
-            const starters = [
-                { x: 80, y: 60, t: 'tree' }, { x: 150, y: 80, t: 'tree' },
-                { x: 300, y: 100, t: 'rock' }, { x: 400, y: 300, t: 'crystal' }
-            ];
-            starters.forEach(s => {
-                const r = this.spawnResource(worldX + s.x, worldY + s.y, s.t);
-                chunkData.resources.push(r);
-            });
-            return;
+        // Zone 1: Safe Forest (0 - 1500px radius)
+        if (distance < 1500) {
+            return 'forest';
         }
 
-        const clusters = WORLD_CONFIG.resourceClusters;
-
-        for (let i = 0; i < clusters; i++) {
-            const centerX = worldX + padding + this.seededRandom(chunkX * 1000 + chunkY + i * 100) * (this.chunkSize - padding * 2);
-            const centerY = worldY + padding + this.seededRandom(chunkX + chunkY * 1000 + i * 200) * (this.chunkSize - padding * 2);
-
-            const resourceType = this.getResourceTypeForBiome(biome, this.seededRandom(chunkX + i));
-
-            const clusterSize = WORLD_CONFIG.clusterSize;
-            for (let j = 0; j < clusterSize; j++) {
-                const offsetX = (this.seededRandom(centerX + j * 10) - 0.5) * 100;
-                const offsetY = (this.seededRandom(centerY + j * 20) - 0.5) * 100;
-
-                const resX = centerX + offsetX;
-                const resY = centerY + offsetY;
-
-                if (resX > worldX + padding && resX < worldX + this.chunkSize - padding &&
-                    resY > worldY + padding && resY < worldY + this.chunkSize - padding) {
-                    const r = this.spawnResource(resX, resY, resourceType);
-                    chunkData.resources.push(r);
-                }
-            }
+        // Zone 2: Wasteland / Badlands (1500 - 3500px radius)
+        if (distance < 3500) {
+            // Mix with some noise for variation borders
+            const n = this.getNoise(x * 0.001, y * 0.001);
+            if (n > 0.7) return 'forest'; // Patches of life
+            return 'wasteland';
         }
+
+        // Zone 3: Crystal Void (3500px+)
+        return 'crystal';
     }
 
     getResourceTypeForBiome(biome, rand) {
+        if (biome === 'forest') {
+            // Mostly trees, some rocks
+            if (rand < 0.7) return 'tree';
+            return 'rock';
+        }
         if (biome === 'wasteland') {
-            return rand < 0.7 ? 'rock' : 'wood'; // Dead trees?
+            // Mostly rocks/iron, dead trees (wood), rare crystals
+            if (rand < 0.6) return 'rock';
+            if (rand < 0.9) return 'tree'; // Dry wood
+            return 'crystal';
         }
         if (biome === 'crystal') {
-            return rand < 0.6 ? 'crystal' : 'rock';
+            // Crystals and Rocks
+            if (rand < 0.6) return 'crystal';
+            return 'rock';
         }
-        // Forest
-        return rand < 0.7 ? 'tree' : 'rock';
+        return 'tree';
+    }
+
+    // Improved Noise Wrapper
+    getNoise(x, y) {
+        return Math.abs(Math.sin(x * 12.989 + y * 78.233 + this.seed));
     }
 
     // Removed getResourceType as it's replaced by getResourceTypeForBiome
@@ -246,7 +235,7 @@ export class WorldGenerator {
             const centerX = worldX + padding + this.seededRandom(chunkX * 1000 + chunkY + i * 100) * (this.chunkSize - padding * 2);
             const centerY = worldY + padding + this.seededRandom(chunkX + chunkY * 1000 + i * 200) * (this.chunkSize - padding * 2);
 
-            const biomeAtCluster = this.getBiomeAt(centerX, centerY);
+            const biomeAtCluster = this.getBiome(centerX, centerY);
             const resourceType = this.getResourceTypeForBiome(biomeAtCluster, this.seededRandom(chunkX + i));
 
             const clusterSize = WORLD_CONFIG.clusterSize;
