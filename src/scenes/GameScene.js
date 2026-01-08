@@ -165,6 +165,8 @@ export class GameScene extends Phaser.Scene {
 
         this.resourcesGroup.children.iterate((resource) => {
             if (!resource || !resource.active) return;
+            // CRITICAL FIX: Ignore objects that don't satisfy the resource contract
+            if (!resource.resourceType || !['tree', 'rock', 'crystal'].includes(resource.resourceType)) return;
 
             const dist = Phaser.Math.Distance.Between(
                 this.player.x, this.player.y,
@@ -191,6 +193,8 @@ export class GameScene extends Phaser.Scene {
     }
 
     startGathering(resource) {
+        if (!resource || !resource.resourceType) return; // Safety check
+
         const storage = window.VoidTycoon.storage;
         const currentTool = TOOLS[storage.data.tools.current];
 
@@ -268,6 +272,12 @@ export class GameScene extends Phaser.Scene {
         };
 
         const reward = baseYields[resourceType];
+        if (!reward) {
+            console.warn('Unknown resource type gathered:', resourceType);
+            this.cancelGathering();
+            return;
+        }
+
         const amount = Math.floor(reward.amount * currentTool.efficiency);
 
         storage.addResource(reward.type, amount);
