@@ -503,8 +503,24 @@ export class GameScene extends Phaser.Scene {
         for (const boss of this.bosses) {
             const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, boss.x, boss.y);
             if (dist < 60) {
-                boss.takeDamage(damage);
-                this.cameras.main.shake(50, 0.003);
+                // Critical Hit Chance
+                let finalDamage = damage;
+                let isCrit = Math.random() < 0.2; // 20% Crit chance
+                if (isCrit) finalDamage *= 2;
+
+                boss.takeDamage(finalDamage);
+
+                // JUICE: Camera Shake & Damage Number
+                this.cameras.main.shake(isCrit ? 100 : 50, isCrit ? 0.005 : 0.002);
+
+                this.showFloatingText(
+                    boss.x,
+                    boss.y - 50,
+                    isCrit ? `💥 ${Math.floor(finalDamage)}!` : `-${Math.floor(finalDamage)}`,
+                    isCrit ? 0xff0000 : 0xffa500
+                );
+
+                window.VoidTycoon.telegram?.hapticFeedback(isCrit ? 'heavy' : 'light');
                 return;
             }
         }

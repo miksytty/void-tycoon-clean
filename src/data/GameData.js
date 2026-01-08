@@ -56,57 +56,58 @@ export const TOOLS = {
     }
 };
 
+// BALANCED MOBS FOR BETA
 export const BOSSES = {
     void_guardian: {
         id: 'void_guardian',
-        name: 'Страж Пустоты',
-        icon: '👹',
-        hp: 100,
-        damage: 10,
-        speed: 80,
+        name: 'Лесной Страж',
+        icon: '🐗', // Changed to Boar for forest vibe
+        hp: 150, // Moderate challenge
+        damage: 8,
+        speed: 90, // Fast but outrunnable
         detectionRange: 200,
         attackRange: 40,
-        dropChance: 0.15,
+        dropChance: 0.3,
         drops: ['dimension_key'],
-        xpReward: 500,
-        color: 0x8B0000,
+        xpReward: 300,
+        color: 0x4caf50,
         size: 1.5,
-        spawnChance: 0.003,
-        minDistanceFromSpawn: 500
+        spawnChance: 0.005,
+        minDistanceFromSpawn: 400
     },
     crystal_golem: {
         id: 'crystal_golem',
-        name: 'Кристальный Голем',
-        icon: '💎',
-        hp: 200,
+        name: 'Стальной Голем', // Badlands boss
+        icon: '🗿',
+        hp: 400, // Tanky
         damage: 15,
-        speed: 50,
+        speed: 40, // Slow but hits hard
         detectionRange: 150,
         attackRange: 50,
         dropChance: 0.25,
-        drops: ['dimension_key', 'crystal'],
+        drops: ['dimension_key', 'steel'],
         xpReward: 800,
-        color: 0x9932CC,
+        color: 0x607d8b,
         size: 2.0,
-        spawnChance: 0.002,
-        minDistanceFromSpawn: 800
+        spawnChance: 0.003,
+        minDistanceFromSpawn: 1500 // In Wasteland
     },
     void_lord: {
         id: 'void_lord',
         name: 'ПОВЕЛИТЕЛЬ ПУСТОТЫ',
         icon: '👑',
-        hp: 500,
-        damage: 25,
-        speed: 100,
-        detectionRange: 300,
-        attackRange: 60,
-        dropChance: 0.5,
+        hp: 2000, // True Boss
+        damage: 40,
+        speed: 120, // Very fast
+        detectionRange: 400,
+        attackRange: 80,
+        dropChance: 1.0, // Guaranteed drop
         drops: ['dimension_key', 'quantum'],
-        xpReward: 2000,
-        color: 0x000000,
-        size: 2.5,
+        xpReward: 5000,
+        color: 0x9c27b0,
+        size: 3.0,
         spawnChance: 0.001,
-        minDistanceFromSpawn: 1200
+        minDistanceFromSpawn: 3500 // In Crystal Zone
     }
 };
 
@@ -115,35 +116,52 @@ export const MOBS = {
         id: 'slime',
         name: 'Слизень',
         icon: '🦠',
-        hp: 30,
-        damage: 5,
-        speed: 30,
+        hp: 20, // Easy kill
+        damage: 3, // Annoying poke
+        speed: 40,
         detectionRange: 150,
         attackRange: 35,
-        dropChance: 0.5,
+        dropChance: 0.6,
         drops: ['wood'],
-        xpReward: 10,
-        color: 0x00ff00,
+        xpReward: 5,
+        color: 0x8bc34a,
         size: 0.8,
-        spawnChance: 0.02,
+        spawnChance: 0.03,
         minDistanceFromSpawn: 200
     },
     bat: {
         id: 'bat',
-        name: 'Летучая мышь',
+        name: 'Кровавая Мышь', // Wasteland mob
         icon: '🦇',
-        hp: 20,
-        damage: 3,
-        speed: 70,
-        detectionRange: 200,
+        hp: 60, // Takes a few hits
+        damage: 10, // Dangerous in groups
+        speed: 100, // Very fast
+        detectionRange: 250,
         attackRange: 30,
-        dropChance: 0.3,
+        dropChance: 0.4,
         drops: ['iron'],
-        xpReward: 15,
-        color: 0x555555,
+        xpReward: 25,
+        color: 0xe53935,
         size: 0.6,
-        spawnChance: 0.015,
-        minDistanceFromSpawn: 300
+        spawnChance: 0.02,
+        minDistanceFromSpawn: 1500
+    },
+    void_wisp: { // NEW MOB for Crystal Zone
+        id: 'void_wisp',
+        name: 'Дух Пустоты',
+        icon: '👻',
+        hp: 150,
+        damage: 20,
+        speed: 60,
+        detectionRange: 300,
+        attackRange: 100, // Rangedish
+        dropChance: 0.5,
+        drops: ['crystal'],
+        xpReward: 80,
+        color: 0x00bcd4,
+        size: 0.9,
+        spawnChance: 0.02,
+        minDistanceFromSpawn: 3500
     }
 };
 
