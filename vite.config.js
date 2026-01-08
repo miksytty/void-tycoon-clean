@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import obfuscatorPlugin from 'rollup-plugin-obfuscator';
 
 export default defineConfig({
-  base: './',
+  base: '/',
   server: {
     port: 3000,
     host: true
