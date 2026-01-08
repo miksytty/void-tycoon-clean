@@ -25,7 +25,6 @@ export default defineConfig({
       plugins: [
         obfuscatorPlugin({
           options: {
-            // Максимальная обфускация
             compact: true,
             controlFlowFlattening: true,
             controlFlowFlatteningThreshold: 0.75,

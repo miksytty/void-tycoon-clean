@@ -51,7 +51,7 @@ export class UIManager {
             this.openModal('inventory');
         });
 
-        // Hotkey I to open inventory
+
         window.addEventListener('keydown', (e) => {
             if (e.code === 'KeyI' || e.key.toLowerCase() === 'i') {
                 this.openModal('inventory');
@@ -118,7 +118,7 @@ export class UIManager {
         if (invModal && !invModal.classList.contains('hidden')) {
             // Проверяем активную вкладку
             if (invModal.querySelector('.tab-btn[data-tab="items"]')?.classList.contains('active')) {
-                // items update (optional, usually items don't change fast like resources)
+
             } else if (invModal.querySelector('.tab-btn[data-tab="craft"]')?.classList.contains('active')) {
                 this.renderCrafting();
             } else if (invModal.querySelector('.tab-btn[data-tab="tools"]')?.classList.contains('active')) {
@@ -197,7 +197,7 @@ export class UIManager {
         if (window.VoidTycoon?.ads) {
             window.VoidTycoon.ads.showAdForEnergy();
         } else {
-            // Fallback - просто даём энергию (для тестов без рекламы)
+
             this.grantAdReward();
         }
     }
@@ -222,7 +222,7 @@ export class UIManager {
      * Открытие модального окна
      */
     openModal(modalId) {
-        this.closeAllModals(); // Fix: close other modals first
+        this.closeAllModals();
         const modal = this.modals[modalId];
         if (!modal) return;
 
@@ -623,11 +623,10 @@ export class UIManager {
         `;
 
         document.body.appendChild(overlay);
-        window.VoidTycoon.sound?.playLevelUp(); // Victory sound needed
+        window.VoidTycoon.sound?.playLevelUp();
 
         document.getElementById('win-reload').addEventListener('click', () => {
-            // New Game Plus logic (reset progress but keep stats?)
-            // For now just reload
+
             window.VoidTycoon.storage.resetProgress();
             location.reload();
         });
@@ -803,7 +802,7 @@ export class UIManager {
         const settings = storage.data.settings;
 
         document.getElementById('setting-sound').checked = settings.soundEnabled;
-        document.getElementById('setting-music').checked = settings.musicEnabled !== false; // Default true
+        document.getElementById('setting-music').checked = settings.musicEnabled !== false;
         document.getElementById('setting-haptic').checked = settings.vibrationEnabled;
     }
 
