@@ -1,0 +1,22 @@
+{
+  "name": "void-tycoon",
+  "version": "1.0.0",
+  "description": "Telegram Mini App - Void Tycoon: Survival & Resource Management Game",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.90.0",
+    "@twa-dev/sdk": "^7.0.0",
+    "phaser": "^3.80.1"
+  },
+  "devDependencies": {
+    "javascript-obfuscator": "^5.1.0",
+    "rollup-plugin-obfuscator": "^1.1.0",
+    "terser": "^5.44.1",
+    "vite": "^5.4.0"
+  }
+}
