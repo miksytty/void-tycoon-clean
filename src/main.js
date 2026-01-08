@@ -1,3 +1,4 @@
+// main.js – entry point for Void Tycoon
 import Phaser from 'phaser';
 import { BootScene } from './scenes/BootScene.js';
 import { GameScene } from './scenes/GameScene.js';
@@ -6,11 +7,15 @@ import { StorageManager } from './core/StorageManager.js';
 import { UIManager } from './ui/UIManager.js';
 import { TutorialManager } from './systems/TutorialManager.js';
 import { DailyRewardsManager } from './systems/DailyRewards.js';
-import { soundManager } from './systems/SoundManager.js';
 import { AdsManager } from './systems/AdsManager.js';
+import { LocalizationManager } from './systems/LocalizationManager.js';
 import { leaderboardAPI } from './core/SupabaseClient.js';
 import { initSecurity } from './systems/Security.js';
-import './styles/main.css';
+import { SoundManager } from './systems/SoundManager.js';
+
+// Initialize global managers
+SoundManager.init();
+import './styles/premium-effects.css'; // 🎨 Premium Visual Effects
 
 window.VoidTycoon = {
     telegram: null,
@@ -18,11 +23,15 @@ window.VoidTycoon = {
     ui: null,
     tutorial: null,
     dailyRewards: null,
-    sound: soundManager,
-    ads: null,
+    ads: new AdsManager(),
+    localization: new LocalizationManager(),
+    sound: SoundManager,
     leaderboard: leaderboardAPI,
     game: null
 };
+
+// Initialize localization
+window.VoidTycoon.localization.init();
 
 async function initApp() {
     try {
@@ -35,10 +44,8 @@ async function initApp() {
         await window.VoidTycoon.storage.init();
 
         window.VoidTycoon.ui = new UIManager();
-
         window.VoidTycoon.tutorial = new TutorialManager();
         window.VoidTycoon.dailyRewards = new DailyRewardsManager();
-        window.VoidTycoon.ads = new AdsManager();
 
         const config = {
             type: Phaser.AUTO,
@@ -46,26 +53,10 @@ async function initApp() {
             width: window.innerWidth,
             height: window.innerHeight,
             backgroundColor: '#1a1a2e',
-            scale: {
-                mode: Phaser.Scale.RESIZE,
-                autoCenter: Phaser.Scale.CENTER_BOTH
-            },
-            physics: {
-                default: 'arcade',
-                arcade: {
-                    gravity: { y: 0 },
-                    debug: false
-                }
-            },
-            render: {
-                antialias: false,
-                pixelArt: true,
-                roundPixels: true
-            },
-            fps: {
-                target: 165,
-                forceSetTimeOut: false
-            },
+            scale: { mode: Phaser.Scale.RESIZE, autoCenter: Phaser.Scale.CENTER_BOTH },
+            physics: { default: 'arcade', arcade: { gravity: { y: 0 }, debug: false } },
+            render: { antialias: false, pixelArt: true, roundPixels: true },
+            fps: { target: 165, forceSetTimeOut: false },
             scene: [BootScene, GameScene]
         };
 
@@ -75,7 +66,6 @@ async function initApp() {
             const loadingScreen = document.getElementById('loading-screen');
             if (loadingScreen) loadingScreen.style.display = 'none';
         }, 1000);
-
     } catch (error) {
         console.error('Init error:', error);
         updateLoadingText('Error loading. Please refresh.');
@@ -89,18 +79,14 @@ function updateLoadingText(text) {
 
 window.updateLoadProgress = function (progress) {
     const progressBar = document.getElementById('load-progress');
-    if (progressBar) {
-        progressBar.style.width = `${progress * 100}%`;
-    }
+    if (progressBar) progressBar.style.width = `${progress * 100}%`;
 };
 
 function hideLoadingScreen() {
     const loadingScreen = document.getElementById('loading-screen');
     if (loadingScreen) {
         loadingScreen.style.opacity = '0';
-        setTimeout(() => {
-            loadingScreen.style.display = 'none';
-        }, 500);
+        setTimeout(() => loadingScreen.style.display = 'none', 500);
     }
 }
 

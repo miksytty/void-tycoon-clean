@@ -1,20 +1,32 @@
 :root {
-    --tg-theme-bg-color: #1a1a2e;
-    --tg-theme-text-color: #ffffff;
-    --tg-theme-hint-color: #aaaaaa;
-    --tg-theme-link-color: #6c5ce7;
-    --tg-theme-button-color: #6c5ce7;
+    /* Premium Neon Color Palette */
+    --tg-theme-bg-color: #0a0e27;
+    --tg-theme-text-color: #e8f4f8;
+    --tg-theme-hint-color: #8ab4f8;
+    --tg-theme-link-color: #7c3aed;
+    --tg-theme-button-color: #8b5cf6;
     --tg-theme-button-text-color: #ffffff;
-    --tg-theme-secondary-bg-color: #16213e;
+    --tg-theme-secondary-bg-color: #1e1b4b;
 
-    --accent-green: #00b894;
-    --accent-red: #d63031;
-    --accent-gold: #fdcb6e;
-    --glass-bg: rgba(30, 30, 60, 0.85);
-    --glass-border: rgba(100, 100, 200, 0.3);
-    --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    --radius: 16px;
-    --radius-sm: 10px;
+    /* Neon Accents */
+    --neon-cyan: #00d9ff;
+    --neon-purple: #a855f7;
+    --neon-pink: #ec4899;
+    --neon-green: #10b981;
+    --neon-orange: #fb923c;
+
+    /* Game Colors */
+    --accent-green: #22c55e;
+    --accent-red: #ef4444;
+    --accent-gold: #fbbf24;
+
+    /* Glassmorphism */
+    --glass-bg: rgba(15, 23, 42, 0.75);
+    --glass-border: rgba(139, 92, 246, 0.3);
+    --glass-glow: 0 0 30px rgba(139, 92, 246, 0.2);
+    --shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    --radius: 20px;
+    --radius-sm: 12px;
 }
 
 * {
@@ -782,4 +794,207 @@ body {
     padding: 10px;
     background: rgba(0, 0, 0, 0.2);
     border-radius: 8px;
+}
+
+/* Animations */
+@keyframes popIn {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Dialog System */
+#dialog-container {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 600px;
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #00ffff;
+    border-radius: 10px;
+    padding: 15px;
+    z-index: 2000;
+    display: none;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.dialog-speaker {
+    color: #ffd700;
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+}
+
+.dialog-text {
+    color: #fff;
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
+.dialog-next {
+    margin-top: 10px;
+    text-align: right;
+    font-size: 0.8rem;
+    color: #888;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Tutorial Arrow */
+.tutorial-arrow {
+    position: absolute;
+    font-size: 40px;
+    color: #ffd700;
+    animation: bounce 1s infinite;
+    pointer-events: none;
+    z-index: 1000;
+    text-shadow: 0 0 10px black;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Skills Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.skills-modal {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    padding: 20px;
+    max-width: 90%;
+    max-height: 80%;
+    overflow-y: auto;
+    box-shadow: var(--glass-glow), var(--shadow);
+}
+
+.skills-modal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.skills-modal .modal-header h2 {
+    font-size: 1.5rem;
+    color: var(--neon-cyan);
+}
+
+.skills-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.skill-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.skill-card.maxed {
+    border-color: var(--accent-gold);
+    background: rgba(251, 191, 36, 0.1);
+}
+
+.skill-icon {
+    font-size: 2rem;
+}
+
+.skill-info {
+    flex: 1;
+}
+
+.skill-info h3 {
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+
+.skill-level {
+    color: var(--neon-purple);
+    font-weight: normal;
+    font-size: 0.85rem;
+}
+
+.skill-info p {
+    color: #888;
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+}
+
+.skill-effect {
+    color: var(--accent-green);
+    font-size: 0.8rem;
+}
+
+.upgrade-btn {
+    padding: 10px 15px;
+    background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.upgrade-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+}
+
+.upgrade-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.max-badge {
+    padding: 10px 15px;
+    background: var(--accent-gold);
+    border-radius: 8px;
+    color: #000;
+    font-weight: bold;
 }

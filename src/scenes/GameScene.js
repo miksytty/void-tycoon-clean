@@ -5,7 +5,8 @@ import { WorldGenerator } from '../systems/WorldGenerator.js';
 import { ResourceManager } from '../systems/ResourceManager.js';
 import { TOOLS, RESOURCES, BUILDINGS, BOSSES, MOBS } from '../data/GameData.js';
 import { VirtualJoystick } from '../ui/VirtualJoystick.js';
-import { Turret } from '../entities/Turret.js';
+// Turret removed - simplified gameplay
+import { Pet } from '../entities/Pet.js';
 
 export class GameScene extends Phaser.Scene {
     constructor() {
@@ -19,7 +20,7 @@ export class GameScene extends Phaser.Scene {
         this.currentResource = null;
         this.lastIncomeTime = 0;
         this.bosses = [];
-        this.turrets = [];
+        // turrets removed
         this.lastBossSpawnCheck = 0;
     }
 
@@ -54,29 +55,69 @@ export class GameScene extends Phaser.Scene {
             window.VoidTycoon.dailyRewards?.checkDailyReward();
         });
 
-        this.loadBuiltTurrets();
+        // loadBuiltTurrets removed - turrets disabled
+        this.checkPetSpawn();
+
+        // Story trigger removed - simplified release
     }
 
-    loadBuiltTurrets() {
-        const storage = window.VoidTycoon.storage;
-        const buildings = storage.data.buildings || {};
-        const turretCount = buildings['turret'] || 0;
-
-        // Reset current
-        this.turrets.forEach(t => t.destroy());
-        this.turrets = [];
-
-        // Spawn in circle around (0,0) - The "Base"
-        for (let i = 0; i < turretCount; i++) {
-            const angle = (i * (360 / Math.max(1, turretCount))) * (Math.PI / 180);
-            const dist = 80;
-            const tx = Math.cos(angle) * dist;
-            const ty = Math.sin(angle) * dist;
-
-            const t = new Turret(this, tx, ty, 1); // Default level 1 for now
-            this.turrets.push(t);
+    showTutorialArrow() {
+        // Find nearest tree
+        const tree = this.findNearbyResource('tree');
+        if (tree) {
+            this.tutorialArrow = this.add.text(tree.x, tree.y - 80, '⬇️', { fontSize: '40px', color: '#ffff00' }).setOrigin(0.5);
+            this.tweens.add({
+                targets: this.tutorialArrow,
+                y: tree.y - 60,
+                yoyo: true,
+                repeat: -1,
+                duration: 500
+            });
+            // Auto destroy after 10s or when gathered
+            this.time.delayedCall(10000, () => {
+                if (this.tutorialArrow) this.tutorialArrow.destroy();
+            });
         }
     }
+
+    // Helper override for findNearbyResource to accept type
+    findNearbyResource(typeFilter = null) {
+        const interactionRadius = typeFilter ? 500 : 60; // Larger radius for tutorial finder
+        // ... existing logic but optimized
+        let closest = null;
+        let closestDist = interactionRadius;
+
+        this.resourcesGroup.children.iterate((resource) => {
+            if (!resource || !resource.active) return;
+            if (typeFilter && resource.resourceType !== typeFilter) return;
+            if (!typeFilter && (!resource.resourceType || !['tree', 'rock', 'crystal'].includes(resource.resourceType))) return;
+
+            const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, resource.x, resource.y);
+            if (dist < closestDist) {
+                closest = resource;
+                closestDist = dist;
+            }
+        });
+        return closest;
+    }
+
+    checkPetSpawn() {
+        const storage = window.VoidTycoon.storage;
+        const equipped = storage.getEquipped();
+
+        if (this.pet) {
+            this.pet.destroy();
+            this.pet = null;
+        }
+
+        if (equipped && equipped.pet) {
+            // Spawn Pet
+            // Assuming 'drone_1' style logic for now
+            this.pet = new Pet(this, this.player.x, this.player.y, equipped.pet);
+        }
+    }
+
+    // loadBuiltTurrets removed - turrets disabled for simplified gameplay
 
     setupInput() {
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -183,15 +224,22 @@ export class GameScene extends Phaser.Scene {
         }
     }
 
-    findNearbyResource() {
-        const interactionRadius = 60;
+    findNearbyResource() { // Old method replaced by helper above? 
+        // Wait, cannot redeclare. I should Replace the existing method completely in the chunk above or here.
+        // Let's replace the Logic here to use arguments.
+        return this.findNearbyResourceWithType();
+    }
+
+    findNearbyResourceWithType(typeFilter = null) {
+        const interactionRadius = typeFilter ? 1000 : 60;
         let closest = null;
         let closestDist = interactionRadius;
 
         this.resourcesGroup.children.iterate((resource) => {
             if (!resource || !resource.active) return;
+            if (typeFilter && resource.resourceType !== typeFilter) return;
             // CRITICAL FIX: Ignore objects that don't satisfy the resource contract
-            if (!resource.resourceType || !['tree', 'rock', 'crystal'].includes(resource.resourceType)) return;
+            if (!typeFilter && (!resource.resourceType || !['tree', 'rock', 'crystal'].includes(resource.resourceType))) return;
 
             const dist = Phaser.Math.Distance.Between(
                 this.player.x, this.player.y,
@@ -462,12 +510,14 @@ export class GameScene extends Phaser.Scene {
 
         this.updateBosses();
 
-        // Update Turrets
-        this.turrets.forEach(turret => turret.update(time, this.bosses));
+        // Turrets update removed
 
         if (time > this.lastBossSpawnCheck + 5000) {
             this.trySpawnBoss();
             this.lastBossSpawnCheck = time;
+        }
+        if (this.pet) {
+            this.pet.update(time, delta);
         }
     }
 

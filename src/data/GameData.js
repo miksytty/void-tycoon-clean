@@ -1,4 +1,90 @@
 
+
+
+
+// Simplified: Only Pet (no boots/backpack complexity)
+export const ITEMS = {
+    drone_1: { id: 'drone_1', name: 'Дрон-Шахтер', type: 'pet', icon: '🛸', description: 'Авто-сбор ресурсов' }
+};
+
+// SKINS, BOOSTERS, STORY removed for simplified release
+// Keep as comments in case needed later:
+/*
+export const SKINS = {
+    default: { id: 'default', name: 'Стандарт', icon: '👤', price: 0 },
+    astronaut: { id: 'astronaut', name: 'Космонавт', icon: '👩‍🚀', price: 50 },
+    ninja: { id: 'ninja', name: 'Ниндзя', icon: '🥷', price: 100 },
+    knight: { id: 'knight', name: 'Рыцарь', icon: '🛡️', price: 200 }
+};
+
+export const BOOSTERS = {
+    speed_boost: { id: 'speed_boost', name: 'Скорость x2 (1м)', icon: '⏩', duration: 60000, price: 10, effect: 'speed', value: 2 },
+    resource_boost: { id: 'resource_boost', name: 'Ресурсы x2 (1м)', icon: '💎', duration: 60000, price: 20, effect: 'resource', value: 2 }
+};
+
+export const STORY = {
+    start: [
+        { speaker: 'System', text: 'Инициализация... Связь с Колонистом установлена.' },
+        { speaker: 'System', text: 'Внимание! Вы находитесь в секторе "Пустота".' },
+        { speaker: 'System', text: 'Ваша задача: Построить Портал и вернуться домой.' },
+        { speaker: 'System', text: 'Начните с добычи Дерева 🌲.' }
+    ],
+    first_craft: [
+        { speaker: 'System', text: 'Отличная работа! Первые инструменты готовы.' },
+        { speaker: 'System', text: 'Теперь стройте здания для автоматической добычи!' }
+    ]
+};
+*/
+
+// Simplified to 5 core technologies only
+export const TECHNOLOGIES = {
+    improved_mining: {
+        id: 'improved_mining',
+        name: 'Усиленная кирка',
+        icon: '⛏️',
+        description: '+50% к добыче ресурса кликом',
+        cost: { wood: 500, iron: 200 },
+        effect: { type: 'gather_mult', value: 0.5 },
+        reqBuilding: 'lumber_mill'
+    },
+    logistics: {
+        id: 'logistics',
+        name: 'Логистика',
+        icon: '📦',
+        description: 'Пассивный доход +20%',
+        cost: { wood: 1000, hardwood: 100 },
+        effect: { type: 'passive_mult', value: 0.2 },
+        reqBuilding: 'lumber_mill'
+    },
+    turbo_boots: {
+        id: 'turbo_boots',
+        name: 'Грави-двигатель',
+        icon: '🥾',
+        description: 'Скорость бега +25%',
+        cost: { steel: 100, chip: 10 },
+        effect: { type: 'speed_mult', value: 0.25 },
+        reqBuilding: 'factory'
+    },
+    quantum_bag: {
+        id: 'quantum_bag',
+        name: 'Квантовый карман',
+        icon: '🎒',
+        description: '+5 Слотов инвентаря',
+        cost: { crystal: 200, quantum: 1 },
+        effect: { type: 'inventory_slots', value: 5 },
+        reqBuilding: 'lab'
+    },
+    automation: {
+        id: 'automation',
+        name: 'Автоматизация',
+        icon: '⚙️',
+        description: 'Все здания работают на 30% быстрее',
+        cost: { chip: 20, quantum: 5 },
+        effect: { type: 'building_speed', value: 0.3 },
+        reqBuilding: 'lab'
+    }
+};
+
 export const RESOURCES = {
     wood: { id: 'wood', name: 'Дерево', icon: '🪵', color: 0x8B4513, description: 'Основной строительный материал.' },
     hardwood: { id: 'hardwood', name: 'Брус', icon: '🟫', color: 0x5D4037, description: 'Обработанное дерево для зданий.' },
@@ -211,6 +297,25 @@ export const RECIPES = [
     }
 ];
 
+export const PROCESSING_RECIPES = {
+    steel_smelt: {
+        id: 'steel_smelt',
+        name: 'Слиток стали',
+        input: { iron: 2 }, // 2 Iron -> 1 Steel (More efficient than craft?) Let's check craft: 5 Iron -> 1 Steel. Yes.
+        output: { steel: 1 },
+        duration: 20000, // 20 seconds
+        xp: 10
+    },
+    hardwood_process: {
+        id: 'hardwood_process',
+        name: 'Сушка дерева',
+        input: { wood: 2 },
+        output: { hardwood: 1 },
+        duration: 10000,
+        xp: 5
+    }
+};
+
 export const BUILDINGS = {
     lumber_mill: {
         id: 'lumber_mill',
@@ -262,20 +367,8 @@ export const BUILDINGS = {
         baseCost: { dimension_key: 1, quantum: 10 },
         costMultiplier: 1,
         production: {},
-        maxLevel: 1
-    },
-    turret: {
-        id: 'turret',
-        name: 'Турель',
-        description: 'Атакует врагов',
-        icon: '🛡️',
-        baseCost: { wood: 100, iron: 50 },
-        costMultiplier: 1.5,
-        production: {}, // No passive resource
-        maxLevel: 10,
-        type: 'defense',
-        stats: { damage: 10, range: 200, fireRate: 1000 } // Custom stats
     }
+    // turret and smelter removed - simplified release
 };
 
 export const SKILLS = {

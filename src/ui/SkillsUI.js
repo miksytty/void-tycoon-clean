@@ -72,7 +72,7 @@ export class SkillsUI {
                     </div>
                 </div>
                 ${!isMax ? `
-                    <button class="upgrade-btn ${canAfford ? '' : 'disabled'}" onclick="window.VoidTycoon.ui.skills.upgradeSkill('${skill.id}')">
+                    <button class="upgrade-btn ${canAfford ? '' : 'disabled'}" onclick="window.VoidTycoon.ui.skillsUI.upgradeSkill('${skill.id}')">
                         ${costText} ⬆️
                     </button>
                 ` : `<div class="max-badge">MAX</div>`}
@@ -103,7 +103,7 @@ export class SkillsUI {
                 storage.data.player.maxEnergy += skill.effect.value;
             }
 
-            window.VoidTycoon.sound?.playLevelUp(); // Re-use sound
+            window.VoidTycoon.sound?.playLevelUp();
             window.VoidTycoon.telegram?.hapticFeedback('success');
 
             // Re-render

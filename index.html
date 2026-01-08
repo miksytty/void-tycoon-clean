@@ -36,6 +36,12 @@
   <div id="game-container"></div>
 
   <div id="ui-overlay">
+    <!-- Dialog Container -->
+    <div id="dialog-container">
+      <div class="dialog-speaker">Speaker</div>
+      <div class="dialog-text">Text content...</div>
+      <div class="dialog-next">Touch to continue ▶</div>
+    </div>
     <div id="hud">
       <div id="player-info">
         <div id="level-badge">LV <span id="player-level">1</span></div>
@@ -62,7 +68,8 @@
           <div id="energy-progress"></div>
         </div>
         <span id="energy-text">100/100</span>
-        <button id="energy-ad-btn" class="ad-btn">📺 +50</button>
+        <button id="energy-ad-btn" class="ad-btn" style="display:none;">📺
+          +50</button><!-- Hidden until ads implemented -->
       </div>
     </div>
 
@@ -71,8 +78,11 @@
       <button id="btn-shop" class="action-btn">🏪</button>
       <button id="btn-quests" class="action-btn">📋</button>
       <button id="btn-achievements" class="action-btn">🏆</button>
-      <button id="btn-ranking" class="action-btn">👑</button>
+      <button id="btn-ranking" class="action-btn"
+        style="display:none;">👑</button><!-- Hidden until leaderboard fixed -->
+      <!-- Smelter button removed - simplified gameplay -->
       <button id="btn-skills" class="action-btn">🎓</button>
+      <button id="btn-research" class="action-btn">🧪</button>
       <button id="btn-settings" class="action-btn">⚙️</button>
     </div>
   </div>
@@ -177,6 +187,14 @@
           <span>📳 Вибрация</span>
           <input type="checkbox" id="setting-haptic" checked>
         </label>
+        <label class="setting-item">
+          <span>📄 Privacy Policy</span>
+          <a href="/privacy.html" id="link-privacy" target="_blank" style="margin-left:8px; color:#ff6b6b;">View</a>
+        </label>
+        <label class="setting-item">
+          <span>📄 Terms of Service</span>
+          <a href="/tos.html" id="link-tos" target="_blank" style="margin-left:8px; color:#ff6b6b;">View</a>
+        </label>
 
         <hr style="border: 0; border-top: 1px solid #444; margin: 15px 0;">
 
@@ -198,10 +216,25 @@
         </button>
       </div>
       <div class="settings-footer">
-        <div class="version-info">Ver: 1.1 Beta (Mobs)</div>
+        <div class="version-info">Ver: 1.0 Release</div>
+        <div style="margin-top:8px; font-size:0.8rem;">
+          <a href="/LICENSES.md" target="_blank" style="color:#ff6b6b;">Licenses</a>
+        </div>
       </div>
     </div>
   </div>
+
+  <div id="research-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🧪 Лаборатория</h2>
+        <button class="close-btn">&times;</button>
+      </div>
+      <div id="research-list"></div>
+    </div>
+  </div>
+
+  <!-- Smelter modal removed - simplified gameplay -->
 
   <div id="notifications-container"></div>
 

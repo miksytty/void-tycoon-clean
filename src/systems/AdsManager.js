@@ -1,58 +1,43 @@
 export class AdsManager {
     constructor() {
-        this.blockId = '20770';
-        this.adController = null;
-        this.isReady = false;
-        this.init();
+        this.enabled = true;
+        this.lastAdTime = 0;
     }
 
-    init() {
-        if (typeof window.Adsgram !== 'undefined') {
-            try {
-                this.adController = window.Adsgram.init({
-                    blockId: this.blockId
-                });
-                this.isReady = true;
-            } catch (e) { }
+    showRewardedAd(onSuccess, onError) {
+        if (!this.enabled) {
+            if (onError) onError('Ads disabled');
+            return;
         }
-    }
 
-    async showAdForEnergy() {
-        const success = await this.showRewardedAd();
-        if (success && window.VoidTycoon?.storage) {
-            window.VoidTycoon.storage.restoreEnergy(50);
-            window.VoidTycoon.ui?.showFloatingText(null, '+50 ⚡', '#ffff00');
-            window.VoidTycoon.telegram?.hapticFeedback('success');
-            const scene = window.VoidTycoon.game?.scene?.getScene('GameScene');
-            scene?.updateHUD();
-        }
-        return success;
-    }
+        console.log('Showing rewarded ad...');
 
-    async showAdForCrystals() {
-        const success = await this.showRewardedAd();
-        if (success && window.VoidTycoon?.storage) {
-            window.VoidTycoon.storage.addResource('crystals', 5);
-            window.VoidTycoon.ui?.showFloatingText(null, '+5 💎', '#00ffff');
-            window.VoidTycoon.telegram?.hapticFeedback('success');
-            const scene = window.VoidTycoon.game?.scene?.getScene('GameScene');
-            scene?.updateHUD();
-        }
-        return success;
-    }
+        // Mock Ad Simulation
+        const adOverlay = document.createElement('div');
+        adOverlay.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: black; color: white; z-index: 10000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        `;
+        adOverlay.innerHTML = `
+            <h1>РЕКЛАМА</h1>
+            <p>Просмотр рекламы дает бонусы...</p>
+            <div style="font-size: 3rem;">📺</div>
+            <p>Осталось: <span id="ad-timer">3</span> сек</p>
+        `;
+        document.body.appendChild(adOverlay);
 
-    async showRewardedAd() {
-        if (!this.isReady || !this.adController) {
-            this.init();
-            if (!this.isReady) {
-                return false;
+        let timeLeft = 3;
+        const timer = setInterval(() => {
+            timeLeft--;
+            const timerEl = document.getElementById('ad-timer');
+            if (timerEl) timerEl.textContent = timeLeft;
+
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                adOverlay.remove();
+                if (onSuccess) onSuccess();
             }
-        }
-        try {
-            const result = await this.adController.show();
-            return result.done;
-        } catch (error) {
-            return false;
-        }
+        }, 1000);
     }
 }

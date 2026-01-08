@@ -5,7 +5,8 @@
  * Модальные окна, инвентарь, магазин, крафт
  */
 
-import { RECIPES, TOOLS, SHOP_ITEMS, RESOURCES, BUILDINGS, ACHIEVEMENTS, QUEST_TEMPLATES } from '../data/GameData.js';
+import { RECIPES, TOOLS, SHOP_ITEMS, RESOURCES, BUILDINGS, ACHIEVEMENTS, QUEST_TEMPLATES, TECHNOLOGIES } from '../data/GameData.js';
+// SKINS, BOOSTERS, STORY, PROCESSING_RECIPES removed - simplified release
 import { SkillsUI } from './SkillsUI.js';
 
 export class UIManager {
@@ -17,7 +18,9 @@ export class UIManager {
             quests: document.getElementById('quests-modal'),
             achievements: document.getElementById('achievements-modal'),
             settings: document.getElementById('settings-modal'),
-            ranking: document.getElementById('ranking-modal')
+            ranking: document.getElementById('ranking-modal'),
+            research: document.getElementById('research-modal')
+            // smelter removed - simplified release
         };
 
         this.init();
@@ -44,6 +47,25 @@ export class UIManager {
 
 
 
+    setupEnergyAdButton() {
+        // Simple manual binding since method might not exist in early version
+        const btn = document.getElementById('energy-ad-btn');
+        if (btn) {
+            btn.addEventListener('click', () => {
+                const ads = window.VoidTycoon.ads;
+                if (ads) {
+                    ads.showRewardedAd(() => {
+                        window.VoidTycoon.storage.restoreEnergy(50);
+                        this.showNotification('⚡ +50 Энергии!', 'success');
+                        this.updateHUD();
+                    });
+                } else {
+                    console.warn('AdsManager not ready');
+                }
+            });
+        }
+    }
+
     /**
      * Настройка кнопок
      */
@@ -67,13 +89,18 @@ export class UIManager {
 
         // Навыки
         document.getElementById('btn-skills')?.addEventListener('click', () => {
-            if (!this.skills) {
-                const { SkillsUI } = require('./SkillsUI.js'); // Assuming bundling handles this, or use top-level import
-                // Let's assume we import at top-level
-            }
-            // For now, assume it's attached to window or imported
-            window.VoidTycoon.ui.skillsUI.show();
+            // SkillsUI is already instantiated in constructor as this.skillsUI
+            this.skillsUI.show();
         });
+
+        // Исследования
+        document.getElementById('btn-research')?.addEventListener('click', () => {
+            this.openModal('research');
+            this.renderResearch();
+        });
+
+
+        // Smelter removed - simplified gameplay
 
         // Настройки
         document.getElementById('btn-settings')?.addEventListener('click', () => {
@@ -250,6 +277,19 @@ export class UIManager {
             this.renderTools();
         } else if (modalId === 'shop') {
             this.renderShop();
+        } else if (modalId === 'research') {
+            this.renderResearch();
+        } else if (modalId === 'smelter') {
+            this.renderSmelter();
+            // Start loop for progress
+            if (this.smelterInterval) clearInterval(this.smelterInterval);
+            this.smelterInterval = setInterval(() => this.updateSmelterUI(), 100);
+        } else {
+            // Clear interval if closed
+            if (this.smelterInterval) {
+                clearInterval(this.smelterInterval);
+                this.smelterInterval = null;
+            }
         }
     }
 
@@ -288,6 +328,7 @@ export class UIManager {
                 slot.innerHTML = `
                     <span class="item-icon">${item.icon}</span>
                     ${item.quantity > 1 ? `<span class="item-count">${item.quantity}</span>` : ''}
+                    ${this.isItemEquipped(item) ? '<span style="position:absolute; top:2px; right:2px; font-size:10px;">🛡️</span>' : ''}
                 `;
 
                 // Клик для использования или просмотра
@@ -296,6 +337,21 @@ export class UIManager {
 
             grid.appendChild(slot);
         }
+    }
+
+    isItemEquipped(item) {
+        if (!item) return false;
+        const storage = window.VoidTycoon.storage;
+        const equipped = storage.getEquipped();
+        if (!equipped) return false;
+
+        if (item.type === 'equipment') {
+            return equipped[item.slot] === item.id;
+        }
+        if (item.type === 'pet') {
+            return equipped.pet === item.id;
+        }
+        return false;
     }
 
     /**
@@ -319,6 +375,32 @@ export class UIManager {
             if (!desc) desc = 'Предмет';
 
             this.showNotification(`ℹ️ ${item.name}: ${desc}`, 'info');
+            return;
+        }
+
+        if (item.type === 'equipment' || item.type === 'pet') {
+            const equippedConfig = storage.getEquipped();
+            // Check if already equipped
+            let isEquipped = false;
+            // Need to match ID. 
+            // equipped.feet = 'boots_1', equipped.pet = 'drone_1'
+            if (equippedConfig[item.slot] === item.id) isEquipped = true; // For equipment
+            if (item.type === 'pet' && equippedConfig.pet === item.id) isEquipped = true;
+
+            // If equipped, unequip? Or just show status.
+            // Let's implement Equip logic.
+            if (!isEquipped) {
+                if (storage.equipItem(item.id, item.slot || (item.type === 'pet' ? 'pet' : 'backpack'))) {
+                    this.showNotification(`⚔️ ${item.name} экипирован!`, 'success');
+                    window.VoidTycoon.sound?.playSuccess();
+                    this.renderInventory();
+                }
+            } else {
+                if (storage.unequipItem(item.slot || (item.type === 'pet' ? 'pet' : 'backpack'))) {
+                    this.showNotification(`📦 ${item.name} снят!`, 'info');
+                    this.renderInventory();
+                }
+            }
             return;
         }
 
@@ -611,10 +693,7 @@ export class UIManager {
         storage.data.buildings[buildingId] = (storage.data.buildings[buildingId] || 0) + 1;
         storage.save();
 
-        if (buildingId === 'turret') {
-            const scene = window.VoidTycoon.game?.scene?.getScene('GameScene');
-            scene?.loadBuiltTurrets();
-        }
+        // Turret handling removed - simplified release
 
         // Проверка победы
         if (buildingId === 'portal') {
@@ -748,34 +827,130 @@ export class UIManager {
     /**
      * Рендер магазина
      */
-    renderShop() {
-        const container = document.getElementById('shop-items');
-        if (!container) return;
+    async renderShop() {
+        // Updated Shop with Tabs
+        const list = document.getElementById('shop-items');
+        if (!list) return;
 
-        container.innerHTML = '';
-
-        SHOP_ITEMS.forEach(item => {
-            const itemEl = document.createElement('div');
-            itemEl.className = 'shop-item';
-
-            itemEl.innerHTML = `
-                <span class="item-icon">${item.icon}</span>
-                <div class="item-info">
-                    <div class="item-name">${item.name}</div>
-                    <div class="item-desc">${item.description}</div>
-                </div>
-                <button class="buy-btn">
-                    <span class="star-icon">⭐</span>
-                    ${item.price?.amount || item.priceStars || 0}
-                </button>
+        let tabsContainer = document.getElementById('shop-tabs');
+        if (!tabsContainer) {
+            const modalContent = list.parentElement; // shop-modal > modal-content
+            // Insert before shop-items
+            tabsContainer = document.createElement('div');
+            tabsContainer.id = 'shop-tabs';
+            tabsContainer.className = 'modal-tabs';
+            tabsContainer.innerHTML = `
+                <div class="tab-btn active" data-tab="resources">Ресурсы</div>
+                <!-- Skins and Boosters tabs removed - not implemented -->
             `;
+            modalContent.insertBefore(tabsContainer, list);
 
-            itemEl.querySelector('.buy-btn').addEventListener('click', () => {
-                this.purchaseItem(item);
+            // Add Click Handlers
+            tabsContainer.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    // Update Active Interface
+                    tabsContainer.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    this.renderShopTab(e.target.dataset.tab);
+                });
             });
+        }
 
-            container.appendChild(itemEl);
-        });
+        // Render default tab (resources) or current active
+        const activeTab = tabsContainer.querySelector('.tab-btn.active')?.dataset.tab || 'resources';
+        this.renderShopTab(activeTab);
+    }
+
+    renderShopTab(tabName) {
+        const list = document.getElementById('shop-items');
+        list.style.display = 'flex'; // Ensure visible
+        list.innerHTML = '';
+        const storage = window.VoidTycoon.storage;
+
+        if (tabName === 'resources') {
+            this.renderShopItem(list, {
+                id: 'energy_refill', name: 'Батончик', icon: '🍫',
+                description: 'Восстановить 50 энергии', priceStars: 1,
+                action: () => {
+                    // Check stars logic needed
+                    // Assuming 'stars' in stats
+                    if ((storage.data.stats.stars || 0) >= 1) {
+                        storage.data.stats.stars -= 1;
+                        storage.restoreEnergy(50);
+                        this.showNotification('Energy Restored!', 'success');
+                        storage.save();
+                        this.renderShopTab('resources'); // Refresh UI
+                    } else {
+                        this.showNotification('Недостаточно звезд ⭐', 'error');
+                    }
+                }
+            });
+        } else if (tabName === 'skins') {
+            Object.values(SKINS).forEach(skin => {
+                const owned = storage.data.skins?.includes(skin.id) || skin.id === 'default';
+                const equipped = storage.data.currentSkin === skin.id;
+
+                this.renderShopItem(list, {
+                    ...skin,
+                    description: owned ? (equipped ? 'Экипировано' : 'Нажмите, чтобы надеть') : `Цена: ${skin.price} ⭐`,
+                    action: () => {
+                        if (owned) {
+                            if (!storage.data.currentSkin) storage.data.currentSkin = 'default';
+                            storage.data.currentSkin = skin.id;
+                            storage.save();
+                            this.showNotification(`Облик ${skin.name} выбран!`, 'success');
+                            this.renderShopTab('skins'); // Refresh
+                        } else {
+                            if ((storage.data.stats.stars || 0) >= skin.price) {
+                                storage.data.stats.stars -= skin.price;
+                                if (!storage.data.skins) storage.data.skins = [];
+                                storage.data.skins.push(skin.id);
+                                storage.save();
+                                this.showNotification(`Облик ${skin.name} куплен!`, 'success');
+                                this.renderShopTab('skins');
+                            } else {
+                                this.showNotification('Недостаточно звезд ⭐', 'error');
+                            }
+                        }
+                    },
+                    btnText: owned ? (equipped ? '✓' : 'Надеть') : (skin.price + ' ⭐')
+                });
+            });
+        } else if (tabName === 'boosters') {
+            Object.values(BOOSTERS).forEach(boost => {
+                this.renderShopItem(list, {
+                    ...boost,
+                    description: `Длительность: ${boost.duration / 60000} мин. Цена: ${boost.price} ⭐`,
+                    action: () => {
+                        if ((storage.data.stats.stars || 0) >= boost.price) {
+                            storage.data.stats.stars -= boost.price;
+                            // Mock booster activation
+                            this.showNotification(`${boost.name} активирован!`, 'success');
+                            storage.save();
+                            this.renderShopTab('boosters');
+                        } else {
+                            this.showNotification('Недостаточно звезд ⭐', 'error');
+                        }
+                    },
+                    btnText: boost.price + ' ⭐'
+                });
+            });
+        }
+    }
+
+    renderShopItem(container, item) {
+        const el = document.createElement('div');
+        el.className = 'shop-item';
+        el.innerHTML = `
+             <div class="item-icon">${item.icon}</div>
+             <div class="item-info">
+                 <div class="item-name">${item.name}</div>
+                 <div class="item-desc">${item.description}</div>
+             </div>
+             <button class="buy-btn">${item.btnText || (item.priceStars + ' ⭐')}</button>
+        `;
+        el.querySelector('button').onclick = item.action;
+        container.appendChild(el);
     }
 
     /**
@@ -838,6 +1013,287 @@ export class UIManager {
     }
 
     /**
+     * Рендер Лаборатории (Исследования)
+     */
+    renderResearch() {
+        const container = document.getElementById('research-list');
+        if (!container) return;
+
+        const storage = window.VoidTycoon.storage;
+        if (!storage) return;
+
+        container.innerHTML = '';
+
+        const buildings = storage.data.buildings || {};
+
+        Object.values(TECHNOLOGIES).forEach(tech => {
+            const isUnlocked = storage.hasTechnology(tech.id);
+            const buildingReq = tech.reqBuilding;
+            const hasBuilding = !buildingReq || (buildings[buildingReq] && buildings[buildingReq] > 0);
+
+            // Если не построено требуемое здание и не изучено - скрываем или показываем заглушку?
+            // Покажем, но заблокируем с сообщением
+
+            const canAfford = Object.entries(tech.cost).every(([res, amount]) =>
+                (storage.getResources()[res] || 0) >= amount
+            );
+
+            const costHtml = Object.entries(tech.cost)
+                .map(([res, amount]) => `${RESOURCES[res]?.icon || res} ${amount}`)
+                .join(' ');
+
+            const el = document.createElement('div');
+            el.className = `shop-item ${isUnlocked ? 'unlocked' : ''} ${!hasBuilding ? 'locked-req' : ''}`;
+            el.style.cssText = `
+                display: flex; align-items: center; gap: 10px;
+                padding: 12px;
+                background: ${isUnlocked ? 'rgba(76, 209, 55, 0.1)' : 'rgba(255,255,255,0.05)'};
+                border: 1px solid ${isUnlocked ? '#4cd137' : 'rgba(255,255,255,0.1)'};
+                border-radius: 10px;
+                margin-bottom: 10px;
+                opacity: ${!hasBuilding && !isUnlocked ? 0.6 : 1};
+            `;
+
+            let btnHtml = '';
+            if (isUnlocked) {
+                btnHtml = `<span style="color: #4cd137; font-weight: bold;">Изучено ✅</span>`;
+            } else if (!hasBuilding) {
+                btnHtml = `<span style="color: #ff6b6b; font-size: 0.8rem;">Требуется: ${BUILDINGS[buildingReq]?.name || buildingReq}</span>`;
+            } else {
+                btnHtml = `
+                    <button class="buy-btn" ${canAfford ? '' : 'disabled'} style="font-size: 0.9rem; padding: 6px 12px;">
+                        🔬 Изучить
+                    </button>
+                    <div style="font-size: 0.75rem; margin-top: 4px; color: ${canAfford ? '#ffd700' : '#ff6b6b'};">${costHtml}</div>
+                `;
+            }
+
+            el.innerHTML = `
+                <div style="font-size: 2rem;">${tech.icon}</div>
+                <div style="flex: 1;">
+                    <div style="font-weight: bold; color: ${isUnlocked ? '#4cd137' : '#fff'};">${tech.name}</div>
+                    <div style="font-size: 0.85rem; color: #aaa;">${tech.description}</div>
+                </div>
+                <div style="text-align: right; min-width: 100px;">
+                    ${btnHtml}
+                </div>
+            `;
+
+            if (!isUnlocked && hasBuilding) {
+                const btn = el.querySelector('.buy-btn');
+                if (btn) {
+                    btn.addEventListener('click', () => {
+                        this.unlockResearch(tech);
+                    });
+                }
+            }
+
+            container.appendChild(el);
+        });
+    }
+
+    /**
+     * Покупка исследования
+     */
+    unlockResearch(tech) {
+        const storage = window.VoidTycoon.storage;
+
+        // Проверка цены еще раз
+        const canAfford = Object.entries(tech.cost).every(([res, amount]) =>
+            (storage.getResources()[res] || 0) >= amount
+        );
+
+        if (!canAfford) return;
+
+        // Списываем
+        Object.entries(tech.cost).forEach(([res, amount]) => {
+            storage.useResource(res, amount);
+        });
+
+        if (storage.unlockTechnology(tech.id)) {
+            this.showNotification(`🧪 ${tech.name} изучено!`, 'success');
+            window.VoidTycoon.sound?.playLevelUp();
+            window.VoidTycoon.telegram?.hapticFeedback('success');
+
+            // Если технология дает эффект для игрока (например +инвентарь), применяем сразу если нужно?
+            // Но обычно мы проверяем hasTechnology при действии.
+            // Для инвентаря придется обновить UI инвентаря.
+            if (tech.effect.type === 'inventory_slots') {
+                // Resize inventory array logic if needed? 
+                // Currently storage.inventory is fixed size in default data. 
+                // Ideally storage.inventory size should be dynamic or checked against a cap.
+                // Assuming storage.getInventorySize() exists or we modify getInventory to check tech.
+            }
+
+            this.renderResearch();
+
+            // Обновить HUD (ресурсы списались)
+            const scene = window.VoidTycoon.game?.scene?.getScene('GameScene');
+            scene?.updateHUD();
+        }
+    }
+
+    /**
+     * Рендер Плавильни
+     */
+    renderSmelter() {
+        const queueContainer = document.getElementById('smelter-queue');
+        const recipesContainer = document.getElementById('smelter-recipes');
+        const slotsEl = document.getElementById('smelter-slots-count');
+
+        if (!queueContainer || !recipesContainer) return;
+
+        const storage = window.VoidTycoon.storage;
+        if (!storage) return;
+
+        // Slots
+        const smelterLevel = storage.data.buildings?.smelter || 0;
+        const totalSlots = Math.max(1, smelterLevel * 2);
+        const activeJobs = storage.getProcessingQueue().filter(j => !j.completed).length;
+
+        if (slotsEl) slotsEl.textContent = `${activeJobs}/${totalSlots}`;
+
+        // Render Queue
+        queueContainer.innerHTML = '';
+        const queue = storage.getProcessingQueue();
+
+        if (queue.length === 0) {
+            queueContainer.innerHTML = '<div style="text-align:center; color:#666;">Очередь пуста</div>';
+        } else {
+            queue.forEach(job => {
+                const recipe = PROCESSING_RECIPES[job.recipeId];
+                if (!recipe) return;
+
+                const jobEl = document.createElement('div');
+                jobEl.className = 'job-item';
+                jobEl.dataset.id = job.id;
+                jobEl.style.cssText = `
+                    background: rgba(255,255,255,0.05);
+                    padding: 10px;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                `;
+
+                const progress = Math.min(100, (Date.now() - job.startTime) / job.duration * 100);
+                const isDone = job.completed || progress >= 100;
+
+                jobEl.innerHTML = `
+                    <div style="font-size: 1.5rem;">${isDone ? '✅' : '⏳'}</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: bold;">${recipe.name}</div>
+                         <div style="background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; margin-top: 5px; overflow: hidden;">
+                            <div class="job-progress" style="width: ${progress}%; height: 100%; background: ${isDone ? '#4cd137' : '#ffd700'}; transition: width 0.1s;"></div>
+                        </div>
+                         <div style="font-size: 0.75rem; color: #888; margin-top: 2px;">
+                            ${isDone ? 'Готово!' : this.formatTime(Math.max(0, job.duration - (Date.now() - job.startTime)))}
+                         </div>
+                    </div>
+                    ${isDone ? `<button class="claim-btn" style="padding: 5px 15px; background: #4cd137; border: none; border-radius: 5px; color: white; cursor: pointer;">Забрать</button>` : ''}
+                `;
+
+                if (isDone) {
+                    jobEl.querySelector('.claim-btn').addEventListener('click', () => {
+                        if (storage.claimProcessedItem(job.id)) {
+                            window.VoidTycoon.sound?.playSuccess();
+                            this.renderSmelter();
+                            const scene = window.VoidTycoon.game?.scene?.getScene('GameScene');
+                            scene?.updateHUD();
+                        }
+                    });
+                }
+
+                queueContainer.appendChild(jobEl);
+            });
+        }
+
+        // Render Recipes
+        recipesContainer.innerHTML = '';
+        Object.values(PROCESSING_RECIPES).forEach(recipe => {
+            const canAfford = Object.entries(recipe.input).every(([res, amount]) =>
+                (storage.getResources()[res] || 0) >= amount
+            );
+
+            const inputHtml = Object.entries(recipe.input)
+                .map(([res, amount]) => `${RESOURCES[res]?.icon || res} ${amount}`)
+                .join(' ');
+
+            const outputHtml = Object.entries(recipe.output)
+                .map(([res, amount]) => `${RESOURCES[res]?.icon || res} ${amount}`)
+                .join(' ');
+
+            const el = document.createElement('div');
+            el.style.cssText = `
+                display: flex; align-items: center; gap: 10px;
+                padding: 10px;
+                background: rgba(255,255,255,0.05);
+                border-radius: 8px;
+                border: 1px solid rgba(255,255,255,0.1);
+            `;
+
+            el.innerHTML = `
+                <div style="flex: 1;">
+                    <div style="font-weight: bold;">${recipe.name}</div>
+                    <div style="font-size: 0.8rem; color: #aaa;">${inputHtml} ➔ ${outputHtml}</div>
+                    <div style="font-size: 0.75rem; color: #666;">⏳ ${recipe.duration / 1000} сек</div>
+                </div>
+                <button class="craft-btn" ${canAfford && activeJobs < totalSlots ? '' : 'disabled'} 
+                    style="padding: 8px 12px; background: #e67e22; border: none; border-radius: 6px; color: white; opacity: ${canAfford && activeJobs < totalSlots ? 1 : 0.5}; cursor: pointer;">
+                    Start
+                </button>
+            `;
+
+            el.querySelector('.craft-btn').addEventListener('click', () => {
+                const result = storage.addProcessingJob(recipe);
+                if (result.success) {
+                    this.renderSmelter();
+                    const scene = window.VoidTycoon.game?.scene?.getScene('GameScene');
+                    scene?.updateHUD();
+                } else {
+                    if (result.reason === 'slots_full') this.showNotification('Очередь переполнена!', 'error');
+                    if (result.reason === 'no_resources') this.showNotification('Недостаточно ресурсов!', 'error');
+                }
+            });
+
+            recipesContainer.appendChild(el);
+        });
+    }
+
+    updateSmelterUI() {
+        if (document.getElementById('smelter-modal').classList.contains('hidden')) return;
+
+        const storage = window.VoidTycoon.storage;
+        if (!storage) return;
+
+        const queue = storage.getProcessingQueue();
+        queue.forEach(job => {
+            const jobEl = document.querySelector(`.job-item[data-id="${job.id}"]`);
+            if (jobEl) {
+                const progress = Math.min(100, (Date.now() - job.startTime) / job.duration * 100);
+                const isDone = job.completed || progress >= 100;
+
+                const bar = jobEl.querySelector('.job-progress');
+                if (bar) bar.style.width = `${progress}%`;
+
+                // If just finished, re-render to show claim button
+                // Need to be careful not to spam re-renders. 
+                // Simple hack: if progress >= 100 and no claim button, re-render.
+                if (isDone && !jobEl.querySelector('.claim-btn')) {
+                    this.renderSmelter();
+                }
+            }
+        });
+    }
+
+    formatTime(ms) {
+        const s = Math.ceil(ms / 1000);
+        const m = Math.floor(s / 60);
+        const rs = s % 60;
+        return `${m}:${rs.toString().padStart(2, '0')}`;
+    }
+
+    /**
      * Отрисовка настроек
      */
     renderSettings() {
@@ -860,7 +1316,8 @@ export class UIManager {
             const enabled = e.target.checked;
             window.VoidTycoon.storage.data.settings.soundEnabled = enabled;
             window.VoidTycoon.storage.save();
-            window.VoidTycoon.sound.masterVolume = enabled ? 0.5 : 0;
+            // Adjust master volume (0.5 when enabled, 0 when disabled)
+            window.VoidTycoon.sound.setMasterVolume(enabled ? 0.5 : 0);
         });
 
         // Музыка
@@ -871,7 +1328,7 @@ export class UIManager {
             if (enabled) {
                 window.VoidTycoon.sound.startAmbientMusic();
             } else {
-                window.VoidTycoon.sound.isMusicPlaying = false; // Stop logic need improvement in SoundManager
+                window.VoidTycoon.sound.stopAmbientMusic();
             }
         });
 
@@ -1365,5 +1822,56 @@ export class UIManager {
 
         window.VoidTycoon.sound?.playSuccess();
         window.VoidTycoon.telegram?.hapticFeedback('heavy');
+    }
+    // --- Dialog System ---
+
+    showDialog(dialogId) {
+        const dialogData = STORY[dialogId];
+        if (!dialogData) return;
+
+        const container = document.getElementById('dialog-container');
+        if (!container) return;
+
+        this.currentDialog = dialogData;
+        this.currentDialogIndex = 0;
+        this.dialogActive = true;
+
+        container.style.display = 'block';
+        this.renderDialogStep();
+
+        if (!this.dialogHandlerSetup) {
+            container.addEventListener('click', () => this.nextDialogStep());
+            this.dialogHandlerSetup = true;
+        }
+    }
+
+    renderDialogStep() {
+        if (!this.currentDialog || this.currentDialogIndex >= this.currentDialog.length) {
+            this.closeDialog();
+            return;
+        }
+
+        const step = this.currentDialog[this.currentDialogIndex];
+        const container = document.getElementById('dialog-container');
+
+        container.querySelector('.dialog-speaker').textContent = step.speaker;
+        container.querySelector('.dialog-text').textContent = step.text;
+    }
+
+    nextDialogStep() {
+        this.currentDialogIndex++;
+        this.renderDialogStep();
+    }
+
+    closeDialog() {
+        const container = document.getElementById('dialog-container');
+        if (container) container.style.display = 'none';
+        this.dialogActive = false;
+
+        if (!this.tutorialArrowShown) {
+            const scene = window.VoidTycoon.game?.scene?.getScene('GameScene');
+            scene?.showTutorialArrow();
+            this.tutorialArrowShown = true;
+        }
     }
 }

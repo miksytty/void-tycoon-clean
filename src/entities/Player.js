@@ -70,6 +70,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
                 // +10% per level
                 speedMult += skillLevel * 0.1;
             }
+
+            // Equipment Bonus
+            const equipStats = window.VoidTycoon.storage.getEquipmentStats();
+            if (equipStats && equipStats.speed) {
+                speedMult += (equipStats.speed - 1); // Stats are base 1.0 + bonus
+            }
         } catch (e) { }
 
         const finalSpeed = baseSpeed * speedMult;
