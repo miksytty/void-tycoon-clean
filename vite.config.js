@@ -22,8 +22,15 @@ export default defineConfig({
       }
     },
     rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['phaser', '@twa-dev/sdk', '@supabase/supabase-js']
+        }
+      },
       plugins: [
         obfuscatorPlugin({
+          include: ['src/**/*.js'],
+          exclude: [/node_modules/],
           options: {
             compact: true,
             controlFlowFlattening: true,
