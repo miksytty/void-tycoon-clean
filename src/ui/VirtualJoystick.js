@@ -3,8 +3,8 @@ export class VirtualJoystick {
         this.scene = scene;
         this.isActive = false;
         this.vector = { x: 0, y: 0 };
-        this.baseRadius = 60;
-        this.maxDistance = 40;
+        this.baseRadius = 80;
+        this.maxDistance = 60;
 
         this.isActionActive = false;
         this.container = null;

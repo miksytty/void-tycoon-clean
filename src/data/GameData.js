@@ -6,7 +6,8 @@ export const RESOURCES = {
     steel: { id: 'steel', name: 'Сталь', icon: '🏗️', color: 0x455A64 },
     crystal: { id: 'crystal', name: 'Кристалл', icon: '💎', color: 0x9932CC },
     chip: { id: 'chip', name: 'Микрочип', icon: '💾', color: 0x2E7D32 },
-    quantum: { id: 'quantum', name: 'Ядро Пустоты', icon: '⚛️', color: 0x00BCD4 }
+    quantum: { id: 'quantum', name: 'Ядро Пустоты', icon: '⚛️', color: 0x00BCD4 },
+    dimension_key: { id: 'dimension_key', name: 'Ключ Измерений', icon: '🗝️', color: 0xFFD700 }
 };
 
 export const TOOLS = {
@@ -17,7 +18,7 @@ export const TOOLS = {
         description: 'Базовый инструмент',
         speed: 1.0,
         efficiency: 1,
-        energyCost: 2,
+        energyCost: 1,
         level: 1
     },
     iron_axe: {
@@ -27,7 +28,7 @@ export const TOOLS = {
         description: 'Усиленный инструмент',
         speed: 1.5,
         efficiency: 1.5,
-        energyCost: 2,
+        energyCost: 1,
         level: 3,
         craftRecipe: { wood: 5, iron: 3 }
     },
@@ -54,6 +55,61 @@ export const TOOLS = {
         craftRecipe: { quantum: 5, chip: 20 }
     }
 };
+
+export const BOSSES = {
+    void_guardian: {
+        id: 'void_guardian',
+        name: 'Страж Пустоты',
+        icon: '👹',
+        hp: 100,
+        damage: 10,
+        speed: 80,
+        detectionRange: 200,
+        attackRange: 40,
+        dropChance: 0.15,
+        drops: ['dimension_key'],
+        xpReward: 500,
+        color: 0x8B0000,
+        size: 1.5,
+        spawnChance: 0.003,
+        minDistanceFromSpawn: 500
+    },
+    crystal_golem: {
+        id: 'crystal_golem',
+        name: 'Кристальный Голем',
+        icon: '💎',
+        hp: 200,
+        damage: 15,
+        speed: 50,
+        detectionRange: 150,
+        attackRange: 50,
+        dropChance: 0.25,
+        drops: ['dimension_key', 'crystal'],
+        xpReward: 800,
+        color: 0x9932CC,
+        size: 2.0,
+        spawnChance: 0.002,
+        minDistanceFromSpawn: 800
+    },
+    void_lord: {
+        id: 'void_lord',
+        name: 'ПОВЕЛИТЕЛЬ ПУСТОТЫ',
+        icon: '👑',
+        hp: 500,
+        damage: 25,
+        speed: 100,
+        detectionRange: 300,
+        attackRange: 60,
+        dropChance: 0.5,
+        drops: ['dimension_key', 'quantum'],
+        xpReward: 2000,
+        color: 0x000000,
+        size: 2.5,
+        spawnChance: 0.001,
+        minDistanceFromSpawn: 1200
+    }
+};
+
 
 export const RECIPES = [
     {
@@ -146,9 +202,9 @@ export const BUILDINGS = {
     portal: {
         id: 'portal',
         name: 'ПОРТАЛ ИЗМЕРЕНИЙ',
-        description: 'Построй, чтобы победить!',
+        description: 'Требуется 🗝️ Ключ Измерений от боссов!',
         icon: '🌌',
-        baseCost: { hardwood: 1000, steel: 1000, chip: 500, quantum: 20 },
+        baseCost: { dimension_key: 1, quantum: 10 },
         costMultiplier: 1,
         production: {},
         maxLevel: 1

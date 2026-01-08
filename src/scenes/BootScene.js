@@ -28,13 +28,13 @@ export class BootScene extends Phaser.Scene {
     }
 
     generateTextures() {
-        // Простые и надежные методы генерации
         this.createPlayerTexture();
         this.createTreeTexture();
         this.createRockTexture();
         this.createCrystalTexture();
         this.createGroundTextures();
         this.createParticleTextures();
+        this.createBossTexture();
     }
 
     createPlayerTexture() {
@@ -56,11 +56,11 @@ export class BootScene extends Phaser.Scene {
             let rightLegY = 26;
 
             if (i === 1) { // Left step
-                leftLegY -= 2;
-                rightLegY += 2;
+                leftLegY -= 1;
+                rightLegY += 1;
             } else if (i === 3) { // Right step
-                leftLegY += 2;
-                rightLegY -= 2;
+                leftLegY += 1;
+                rightLegY -= 1;
             }
 
             // Legs
@@ -239,5 +239,27 @@ export class BootScene extends Phaser.Scene {
         g.fillStyle(0xe040fb);
         g.fillRect(0, 0, 4, 4);
         g.generateTexture('particle_crystal', 4, 4);
+    }
+
+    createBossTexture() {
+        const g = this.make.graphics({ x: 0, y: 0, add: false });
+
+        g.fillStyle(0x1a1a2e);
+        g.fillRect(8, 8, 16, 20);
+
+        g.fillStyle(0xff0000);
+        g.fillRect(10, 12, 4, 4);
+        g.fillRect(18, 12, 4, 4);
+
+        g.fillStyle(0x4a0000);
+        g.fillRect(12, 4, 8, 6);
+        g.fillRect(8, 6, 4, 4);
+        g.fillRect(20, 6, 4, 4);
+
+        g.fillStyle(0x2d2d44);
+        g.fillRect(6, 14, 4, 10);
+        g.fillRect(22, 14, 4, 10);
+
+        g.generateTexture('boss', 32, 32);
     }
 }

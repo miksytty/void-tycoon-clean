@@ -1,8 +1,9 @@
 import Phaser from 'phaser';
 import { Player } from '../entities/Player.js';
+import { Boss } from '../entities/Boss.js';
 import { WorldGenerator } from '../systems/WorldGenerator.js';
 import { ResourceManager } from '../systems/ResourceManager.js';
-import { TOOLS, RESOURCES, BUILDINGS } from '../data/GameData.js';
+import { TOOLS, RESOURCES, BUILDINGS, BOSSES } from '../data/GameData.js';
 import { VirtualJoystick } from '../ui/VirtualJoystick.js';
 
 export class GameScene extends Phaser.Scene {
@@ -16,6 +17,8 @@ export class GameScene extends Phaser.Scene {
         this.gatherProgress = 0;
         this.currentResource = null;
         this.lastIncomeTime = 0;
+        this.bosses = [];
+        this.lastBossSpawnCheck = 0;
     }
 
     create() {
@@ -153,6 +156,16 @@ export class GameScene extends Phaser.Scene {
         });
 
         return closest;
+    }
+
+    findNearbyBoss() {
+        const attackRadius = 80;
+        for (const boss of this.bosses) {
+            if (boss.isDead) continue;
+            const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, boss.x, boss.y);
+            if (dist < attackRadius) return boss;
+        }
+        return null;
     }
 
     startGathering(resource) {
@@ -329,7 +342,13 @@ export class GameScene extends Phaser.Scene {
 
         const nearbyResource = this.findNearbyResource();
 
-        if (nearbyResource && !this.isGathering) {
+        const nearbyBossForPrompt = this.findNearbyBoss();
+
+        if (nearbyBossForPrompt && !this.isGathering) {
+            this.resourcePrompt.setVisible(true);
+            this.resourcePrompt.setPosition(nearbyBossForPrompt.x, nearbyBossForPrompt.y - 60);
+            this.resourcePrompt.setText(`[SPACE] ⚔️ Атаковать!`);
+        } else if (nearbyResource && !this.isGathering) {
             this.resourcePrompt.setVisible(true);
             this.resourcePrompt.setPosition(nearbyResource.x, nearbyResource.y - 50);
 
@@ -342,7 +361,11 @@ export class GameScene extends Phaser.Scene {
         const isActionBtnDown = this.virtualJoystick?.isActionDown() || false;
         const gatherPressed = this.spaceKey.isDown || isActionBtnDown;
 
-        if (gatherPressed && nearbyResource && !this.isGathering) {
+        const nearbyBoss = this.findNearbyBoss();
+
+        if (gatherPressed && nearbyBoss && !this.isGathering) {
+            this.attackBoss();
+        } else if (gatherPressed && nearbyResource && !this.isGathering) {
             this.startGathering(nearbyResource);
         }
 
@@ -357,6 +380,66 @@ export class GameScene extends Phaser.Scene {
         if (time > this.lastIncomeTime + 1000) {
             this.processPassiveIncome();
             this.lastIncomeTime = time;
+        }
+
+        this.updateBosses();
+
+        if (time > this.lastBossSpawnCheck + 5000) {
+            this.trySpawnBoss();
+            this.lastBossSpawnCheck = time;
+        }
+    }
+
+    trySpawnBoss() {
+        const px = this.player.x;
+        const py = this.player.y;
+
+        for (const bossConfig of Object.values(BOSSES)) {
+            if (Math.random() > bossConfig.spawnChance) continue;
+
+            const distFromSpawn = Math.sqrt(px * px + py * py);
+            if (distFromSpawn < bossConfig.minDistanceFromSpawn) continue;
+
+            const angle = Math.random() * Math.PI * 2;
+            const dist = 300 + Math.random() * 200;
+            const spawnX = px + Math.cos(angle) * dist;
+            const spawnY = py + Math.sin(angle) * dist;
+
+            const boss = new Boss(this, spawnX, spawnY, bossConfig);
+            this.bosses.push(boss);
+
+            this.showFloatingText(spawnX, spawnY - 50, `${bossConfig.icon} ${bossConfig.name}!`, bossConfig.color);
+            window.VoidTycoon.ui?.showNotification(`⚠️ ${bossConfig.name} появился!`, 'error');
+
+            break;
+        }
+    }
+
+    updateBosses() {
+        for (let i = this.bosses.length - 1; i >= 0; i--) {
+            const boss = this.bosses[i];
+            if (boss.isDead) {
+                this.bosses.splice(i, 1);
+                continue;
+            }
+            boss.update(this.player);
+        }
+    }
+
+    attackBoss() {
+        const storage = window.VoidTycoon?.storage;
+        if (!storage) return;
+
+        const currentTool = TOOLS[storage.data.tools.current];
+        const damage = 10 * currentTool.efficiency;
+
+        for (const boss of this.bosses) {
+            const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, boss.x, boss.y);
+            if (dist < 60) {
+                boss.takeDamage(damage);
+                this.cameras.main.shake(50, 0.003);
+                return;
+            }
         }
     }
 
