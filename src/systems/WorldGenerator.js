@@ -180,13 +180,130 @@ export class WorldGenerator {
         });
     }
 
-    noise(x, y) {
+    // Improved smooth noise (Value Noise)
+    smoothNoise(x, y) {
+        const floorX = Math.floor(x);
+        const floorY = Math.floor(y);
+        const fractX = x - floorX;
+        const fractY = y - floorY;
+
+        // Smootherstep
+        const sX = fractX * fractX * (3 - 2 * fractX);
+        const sY = fractY * fractY * (3 - 2 * fractY);
+
+        const tl = this.rawNoise(floorX, floorY);
+        const tr = this.rawNoise(floorX + 1, floorY);
+        const bl = this.rawNoise(floorX, floorY + 1);
+        const br = this.rawNoise(floorX + 1, floorY + 1);
+
+        const top = tl + (tr - tl) * sX;
+        const bottom = bl + (br - bl) * sX;
+
+        return top + (bottom - top) * sY;
+    }
+
+    rawNoise(x, y) {
         const n = Math.sin(x * 12.9898 + y * 78.233 + this.seed) * 43758.5453;
         return n - Math.floor(n);
+    }
+
+    // Kept for backward compatibility if seededRandom uses it, 
+    // but internal biome logic now uses smoothNoise
+    noise(x, y) {
+        return this.rawNoise(x, y);
     }
 
     seededRandom(seed) {
         const x = Math.sin(seed + this.seed) * 10000;
         return x - Math.floor(x);
+    }
+
+    getBiomeAt(x, y) {
+        // Reduced frequency for larger biomes
+        const n = this.smoothNoise(x * 0.002, y * 0.002);
+
+        if (n < 0.35) return 'wasteland';
+        if (n > 0.65) return 'crystal';
+        return 'forest';
+    }
+
+    generateChunk(chunkX, chunkY) {
+        const worldX = chunkX * this.chunkSize;
+        const worldY = chunkY * this.chunkSize;
+        const tilesPerChunk = this.chunkSize / this.tileSize;
+
+        const chunkData = { tiles: [], resources: [] };
+
+        for (let tx = 0; tx < tilesPerChunk; tx++) {
+            for (let ty = 0; ty < tilesPerChunk; ty++) {
+                const tileX = worldX + tx * this.tileSize + this.tileSize / 2;
+                const tileY = worldY + ty * this.tileSize + this.tileSize / 2;
+
+                const biome = this.getBiomeAt(tileX, tileY);
+
+                let textureKey = 'tile_grass_light';
+
+                if (biome === 'wasteland') textureKey = 'tile_wasteland';
+                else if (biome === 'forest') textureKey = (tx + ty) % 2 === 0 ? 'tile_grass_light' : 'tile_grass_dark';
+                else if (biome === 'crystal') textureKey = 'tile_crystal';
+
+                const tile = this.scene.add.image(tileX, tileY, textureKey);
+
+                // Add biome-specific tints/scale variations
+                if (biome === 'wasteland') {
+                    tile.setTint(0xaaaaaa);
+                }
+
+                tile.setDepth(-10000000);
+                this.scene.groundLayer.add(tile);
+                chunkData.tiles.push(tile);
+            }
+        }
+
+        this.generateResourcesInChunk(chunkX, chunkY, worldX, worldY, chunkData);
+        this.loadedChunks.set(`${chunkX},${chunkY}`, chunkData);
+    }
+
+    // generateResourcesInChunk now calculates biome per resource location
+    generateResourcesInChunk(chunkX, chunkY, worldX, worldY, chunkData) {
+        const padding = 40;
+
+        if (chunkX === 0 && chunkY === 0) {
+            // Spawn area safety
+            const starters = [
+                { x: 80, y: 60, t: 'tree' }, { x: 150, y: 80, t: 'tree' },
+                { x: 300, y: 100, t: 'rock' }, { x: 400, y: 300, t: 'crystal' }
+            ];
+            starters.forEach(s => {
+                const r = this.spawnResource(worldX + s.x, worldY + s.y, s.t);
+                chunkData.resources.push(r);
+            });
+            return;
+        }
+
+        const clusters = WORLD_CONFIG.resourceClusters;
+
+        for (let i = 0; i < clusters; i++) {
+            const centerX = worldX + padding + this.seededRandom(chunkX * 1000 + chunkY + i * 100) * (this.chunkSize - padding * 2);
+            const centerY = worldY + padding + this.seededRandom(chunkX + chunkY * 1000 + i * 200) * (this.chunkSize - padding * 2);
+
+            const biomeAtCluster = this.getBiomeAt(centerX, centerY);
+            const resourceType = this.getResourceTypeForBiome(biomeAtCluster, this.seededRandom(chunkX + i));
+
+            const clusterSize = WORLD_CONFIG.clusterSize;
+            for (let j = 0; j < clusterSize; j++) {
+                const offsetX = (this.seededRandom(centerX + j * 10) - 0.5) * 100;
+                const offsetY = (this.seededRandom(centerY + j * 20) - 0.5) * 100;
+
+                const resX = centerX + offsetX;
+                const resY = centerY + offsetY;
+
+                if (resX > worldX + padding && resX < worldX + this.chunkSize - padding &&
+                    resY > worldY + padding && resY < worldY + this.chunkSize - padding) {
+                    const r = this.spawnResource(resX, resY, resourceType);
+                    chunkData.resources.push(r);
+                }
+            }
+        }
     }
 }

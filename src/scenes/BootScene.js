@@ -33,9 +33,57 @@ export class BootScene extends Phaser.Scene {
         this.createRockTexture();
         this.createCrystalTexture();
         this.createGroundTextures();
+        this.createWastelandTexture();
+        this.createCrystalGroundTexture();
         this.createParticleTextures();
         this.createBossTexture();
     }
+
+    // ... existing methods ...
+
+    createWastelandTexture() {
+        const g = this.make.graphics({ x: 0, y: 0, add: false });
+
+        // Base - dark, dry earth
+        g.fillStyle(0x3e2723);
+        g.fillRect(0, 0, 32, 32);
+
+        // Cracks
+        g.lineStyle(1, 0x1a1a1a, 0.5);
+        g.beginPath();
+        g.moveTo(5, 5); g.lineTo(10, 15); g.lineTo(5, 25);
+        g.moveTo(20, 5); g.lineTo(25, 12);
+        g.moveTo(15, 25); g.lineTo(25, 20);
+        g.strokePath();
+
+        // Dark patches
+        g.fillStyle(0x2d1b18);
+        g.fillRect(8, 8, 4, 4);
+        g.fillRect(22, 20, 6, 2);
+
+        g.generateTexture('tile_wasteland', 32, 32);
+    }
+
+    createCrystalGroundTexture() {
+        const g = this.make.graphics({ x: 0, y: 0, add: false });
+
+        // Base - dark purple ground
+        g.fillStyle(0x2a0e36);
+        g.fillRect(0, 0, 32, 32);
+
+        // Shimmering specks
+        g.fillStyle(0x9c27b0);
+        g.fillRect(5, 10, 2, 2);
+        g.fillRect(25, 5, 2, 2);
+        g.fillRect(15, 25, 2, 2);
+
+        // Light lines
+        g.lineStyle(1, 0x7b1fa2, 0.3);
+        g.strokeRect(10, 10, 12, 12);
+
+        g.generateTexture('tile_crystal', 32, 32);
+    }
+
 
     createPlayerTexture() {
         const frameWidth = 32;

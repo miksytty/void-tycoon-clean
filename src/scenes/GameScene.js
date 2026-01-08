@@ -108,6 +108,16 @@ export class GameScene extends Phaser.Scene {
             strokeThickness: 4,
             align: 'center'
         }).setOrigin(0.5).setDepth(200).setVisible(false);
+
+        this.objectiveText = this.add.text(this.cameras.main.width / 2, 60, '', {
+            fontFamily: '"Rubik", sans-serif',
+            fontSize: '16px',
+            fontStyle: 'bold',
+            color: '#ffd700',
+            stroke: '#000000',
+            strokeThickness: 4,
+            align: 'center'
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(200);
     }
 
     updateHUD() {
@@ -130,6 +140,18 @@ export class GameScene extends Phaser.Scene {
         const energyPercent = (player.energy / player.maxEnergy) * 100;
         document.getElementById('energy-progress').style.width = `${energyPercent}%`;
         document.getElementById('energy-text').textContent = `${player.energy}/${player.maxEnergy}`;
+
+        // Update Objective
+        if (this.objectiveText) {
+            const hasKey = (resources.dimension_key || 0) > 0;
+            if (hasKey) {
+                this.objectiveText.setText('Цель: Построить ПОРТАЛ ИЗМЕРЕНИЙ 🌌');
+                this.objectiveText.setColor('#00ffff');
+            } else {
+                this.objectiveText.setText('Цель: Найти Босса и выбить Ключ 👹');
+                this.objectiveText.setColor('#ffd700');
+            }
+        }
 
         if (window.VoidTycoon?.ui?.updateActiveView) {
             window.VoidTycoon.ui.updateActiveView();
