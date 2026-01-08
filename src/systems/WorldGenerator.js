@@ -7,7 +7,8 @@ export class WorldGenerator {
         this.loadedChunks = new Map();
         this.chunkSize = WORLD_CONFIG.chunkSize;
         this.tileSize = WORLD_CONFIG.tileSize;
-        this.viewDistance = WORLD_CONFIG.viewDistance;
+        this.viewDistance = 1; // PERFORMANCE: Reduced from 2 to 1 (only immediate neighbors)
+        this.maxChunks = 25; // Hard limit on active chunks
 
         this.seed = window.VoidTycoon?.storage?.getPlayer()?.id || Date.now();
     }
@@ -156,17 +157,50 @@ export class WorldGenerator {
             const dy = Math.abs(cy - currentChunkY);
 
             if (dx > maxDistance || dy > maxDistance) {
-                // Optimized cleanup: destroy tracked objects directly
-                if (chunkData.tiles) {
-                    chunkData.tiles.forEach(tile => tile.destroy());
-                }
-                if (chunkData.resources) {
-                    chunkData.resources.forEach(resource => resource.destroy());
-                }
-
-                this.loadedChunks.delete(key);
+                this.destroyChunk(chunkData, key);
             }
         });
+
+        // SAFETY NET: If we still have too many chunks, delete the furthest ones
+        if (this.loadedChunks.size > this.maxChunks) {
+            const keysToDelete = [];
+
+            // Find chunks furthest from player
+            for (const [key, chunkData] of this.loadedChunks) {
+                const [cx, cy] = key.split(',').map(Number);
+                const dist = Math.sqrt(Math.pow(cx - currentChunkX, 2) + Math.pow(cy - currentChunkY, 2));
+                if (dist > this.viewDistance + 1) {
+                    keysToDelete.push(key);
+                }
+            }
+
+            // Force delete them
+            keysToDelete.forEach(key => {
+                this.destroyChunk(this.loadedChunks.get(key), key);
+            });
+        }
+    }
+
+    destroyChunk(chunkData, key) {
+        if (!chunkData) return;
+
+        // Aggressively destroy tiles
+        if (chunkData.tiles) {
+            for (let i = 0; i < chunkData.tiles.length; i++) {
+                if (chunkData.tiles[i]) chunkData.tiles[i].destroy();
+            }
+            chunkData.tiles = []; // Clear reference
+        }
+
+        // Aggressively destroy resources
+        if (chunkData.resources) {
+            for (let i = 0; i < chunkData.resources.length; i++) {
+                if (chunkData.resources[i]) chunkData.resources[i].destroy();
+            }
+            chunkData.resources = []; // Clear reference
+        }
+
+        this.loadedChunks.delete(key);
     }
 
     // Improved smooth noise (Value Noise)
