@@ -110,6 +110,43 @@ export const BOSSES = {
     }
 };
 
+export const MOBS = {
+    slime: {
+        id: 'slime',
+        name: 'Слизень',
+        icon: '🦠',
+        hp: 30,
+        damage: 5,
+        speed: 30,
+        detectionRange: 150,
+        attackRange: 35,
+        dropChance: 0.5,
+        drops: ['wood'],
+        xpReward: 10,
+        color: 0x00ff00,
+        size: 0.8,
+        spawnChance: 0.02,
+        minDistanceFromSpawn: 200
+    },
+    bat: {
+        id: 'bat',
+        name: 'Летучая мышь',
+        icon: '🦇',
+        hp: 20,
+        damage: 3,
+        speed: 70,
+        detectionRange: 200,
+        attackRange: 30,
+        dropChance: 0.3,
+        drops: ['iron'],
+        xpReward: 15,
+        color: 0x555555,
+        size: 0.6,
+        spawnChance: 0.015,
+        minDistanceFromSpawn: 300
+    }
+};
+
 
 export const RECIPES = [
     {

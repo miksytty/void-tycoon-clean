@@ -31,7 +31,6 @@ export class LeaderboardAPI {
         console.log(line);
         this.debugLog.push(line);
 
-        // Пишем в UI если есть контейнер
         const debugDiv = document.getElementById('debug-log');
         if (debugDiv) {
             const el = document.createElement('div');

@@ -48,10 +48,18 @@ export class SoundManager {
             console.log('🔊 Audio Engine Initialized');
 
             // Unlock audio context on interaction
+            // Unlock audio context on interaction
             const unlock = () => {
+                const start = () => {
+                    if (!this.musicInterval) this.startMusic();
+                };
+
                 if (this.context.state === 'suspended') {
-                    this.context.resume().then(() => this.startMusic());
+                    this.context.resume().then(start);
+                } else {
+                    start();
                 }
+
                 document.removeEventListener('click', unlock);
                 document.removeEventListener('keydown', unlock);
                 document.removeEventListener('touchstart', unlock);

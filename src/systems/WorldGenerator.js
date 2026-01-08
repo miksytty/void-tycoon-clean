@@ -187,7 +187,6 @@ export class WorldGenerator {
         const fractX = x - floorX;
         const fractY = y - floorY;
 
-        // Smootherstep
         const sX = fractX * fractX * (3 - 2 * fractX);
         const sY = fractY * fractY * (3 - 2 * fractY);
 
@@ -207,8 +206,6 @@ export class WorldGenerator {
         return n - Math.floor(n);
     }
 
-    // Kept for backward compatibility if seededRandom uses it, 
-    // but internal biome logic now uses smoothNoise
     noise(x, y) {
         return this.rawNoise(x, y);
     }
@@ -219,49 +216,11 @@ export class WorldGenerator {
     }
 
     getBiomeAt(x, y) {
-        // Reduced frequency for larger biomes
         const n = this.smoothNoise(x * 0.002, y * 0.002);
 
         if (n < 0.35) return 'wasteland';
         if (n > 0.65) return 'crystal';
         return 'forest';
-    }
-
-    generateChunk(chunkX, chunkY) {
-        const worldX = chunkX * this.chunkSize;
-        const worldY = chunkY * this.chunkSize;
-        const tilesPerChunk = this.chunkSize / this.tileSize;
-
-        const chunkData = { tiles: [], resources: [] };
-
-        for (let tx = 0; tx < tilesPerChunk; tx++) {
-            for (let ty = 0; ty < tilesPerChunk; ty++) {
-                const tileX = worldX + tx * this.tileSize + this.tileSize / 2;
-                const tileY = worldY + ty * this.tileSize + this.tileSize / 2;
-
-                const biome = this.getBiomeAt(tileX, tileY);
-
-                let textureKey = 'tile_grass_light';
-
-                if (biome === 'wasteland') textureKey = 'tile_wasteland';
-                else if (biome === 'forest') textureKey = (tx + ty) % 2 === 0 ? 'tile_grass_light' : 'tile_grass_dark';
-                else if (biome === 'crystal') textureKey = 'tile_crystal';
-
-                const tile = this.scene.add.image(tileX, tileY, textureKey);
-
-                // Add biome-specific tints/scale variations
-                if (biome === 'wasteland') {
-                    tile.setTint(0xaaaaaa);
-                }
-
-                tile.setDepth(-10000000);
-                this.scene.groundLayer.add(tile);
-                chunkData.tiles.push(tile);
-            }
-        }
-
-        this.generateResourcesInChunk(chunkX, chunkY, worldX, worldY, chunkData);
-        this.loadedChunks.set(`${chunkX},${chunkY}`, chunkData);
     }
 
     // generateResourcesInChunk now calculates biome per resource location

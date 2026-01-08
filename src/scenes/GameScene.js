@@ -3,7 +3,7 @@ import { Player } from '../entities/Player.js';
 import { Boss } from '../entities/Boss.js';
 import { WorldGenerator } from '../systems/WorldGenerator.js';
 import { ResourceManager } from '../systems/ResourceManager.js';
-import { TOOLS, RESOURCES, BUILDINGS, BOSSES } from '../data/GameData.js';
+import { TOOLS, RESOURCES, BUILDINGS, BOSSES, MOBS } from '../data/GameData.js';
 import { VirtualJoystick } from '../ui/VirtualJoystick.js';
 
 export class GameScene extends Phaser.Scene {
@@ -360,7 +360,15 @@ export class GameScene extends Phaser.Scene {
         const darkness = Phaser.Math.Clamp(Math.max(0, -cycle * 0.7), 0, 0.7);
         if (this.dayNightOverlay) this.dayNightOverlay.fillAlpha = darkness;
 
-        this.worldGenerator.generateAroundPlayer();
+        const distMoved = Phaser.Math.Distance.Between(
+            this.player.x, this.player.y,
+            this.lastChunkUpdatePos?.x || 0, this.lastChunkUpdatePos?.y || 0
+        );
+
+        if (distMoved > 64 || !this.lastChunkUpdatePos) {
+            this.worldGenerator.generateAroundPlayer();
+            this.lastChunkUpdatePos = { x: this.player.x, y: this.player.y };
+        }
 
         const nearbyResource = this.findNearbyResource();
 
@@ -416,6 +424,7 @@ export class GameScene extends Phaser.Scene {
         const px = this.player.x;
         const py = this.player.y;
 
+        // Try Spawn Bosses
         for (const bossConfig of Object.values(BOSSES)) {
             if (Math.random() > bossConfig.spawnChance) continue;
 
@@ -433,7 +442,26 @@ export class GameScene extends Phaser.Scene {
             this.showFloatingText(spawnX, spawnY - 50, `${bossConfig.icon} ${bossConfig.name}!`, bossConfig.color);
             window.VoidTycoon.ui?.showNotification(`⚠️ ${bossConfig.name} появился!`, 'error');
 
-            break;
+            return; // Only one spawn per cycle
+        }
+
+        // Try Spawn Mobs
+        if (this.bosses.length < 10) { // Limit max entities
+            for (const mobConfig of Object.values(MOBS)) {
+                if (Math.random() > mobConfig.spawnChance) continue;
+
+                const angle = Math.random() * Math.PI * 2;
+                const dist = 300 + Math.random() * 200;
+                const spawnX = px + Math.cos(angle) * dist;
+                const spawnY = py + Math.sin(angle) * dist;
+
+                // Basic check for distance from spawn (safe zone)
+                if (Math.sqrt(spawnX * spawnX + spawnY * spawnY) < 200) continue;
+
+                const mob = new Boss(this, spawnX, spawnY, mobConfig);
+                this.bosses.push(mob);
+                break;
+            }
         }
     }
 
