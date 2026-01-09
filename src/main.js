@@ -11,10 +11,9 @@ import { AdsManager } from './systems/AdsManager.js';
 import { LocalizationManager } from './systems/LocalizationManager.js';
 import { leaderboardAPI } from './core/SupabaseClient.js';
 import { initSecurity } from './systems/Security.js';
-import { SoundManager } from './systems/SoundManager.js';
+import { AudioManager } from './core/AudioManager.js';
 
 // Initialize global managers
-SoundManager.init();
 import './styles/premium-effects.css'; // 🎨 Premium Visual Effects
 
 window.VoidTycoon = {
@@ -25,7 +24,7 @@ window.VoidTycoon = {
     dailyRewards: null,
     ads: new AdsManager('20849'), // Production Block ID
     localization: new LocalizationManager(),
-    sound: SoundManager,
+    audio: new AudioManager(), // New robust audio
     leaderboard: leaderboardAPI,
     game: null
 };

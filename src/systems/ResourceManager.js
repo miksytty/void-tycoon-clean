@@ -52,6 +52,26 @@ export class ResourceManager {
             emitting: false,
             tint: [0xab47bc, 0xce93d8, 0x9c27b0]
         }).setDepth(250);
+
+        // Частицы пыли (ходьба)
+        // Check if particle_wood exists, or generic particle
+        const dustTexture = 'particle'; // Default white square from BootScene
+        this.particleEmitters.dust = this.scene.add.particles(0, 0, dustTexture, {
+            speed: { min: 10, max: 30 },
+            angle: { min: 0, max: 360 },
+            scale: { start: 0.5, end: 0 },
+            alpha: { start: 0.5, end: 0 },
+            lifespan: 400,
+            quantity: 0,
+            emitting: false,
+            tint: 0xcccccc
+        }).setDepth(10); // Under player
+    }
+
+    createDust(x, y) {
+        if (this.particleEmitters.dust) {
+            this.particleEmitters.dust.emitParticleAt(x, y, 1);
+        }
     }
 
     /**

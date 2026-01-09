@@ -447,6 +447,14 @@ export class GameScene extends Phaser.Scene {
             );
         }
 
+        // Audio & Haptics
+        const sfxType = resourceType === 'tree' ? 'hit_wood' : (resourceType === 'rock' ? 'hit_stone' : 'collect');
+        window.VoidTycoon.audio?.playSFX(sfxType);
+
+        if (window.Telegram?.WebApp?.HapticFeedback) {
+            window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+        }
+
         this.cameras.main.shake(100, 0.005);
 
         const sounds = {
@@ -606,10 +614,24 @@ export class GameScene extends Phaser.Scene {
             this.trySpawnBoss();
             this.lastBossSpawnCheck = time;
         }
+
+        // Update Quest Manager
+        if (this.questManager) {
+            this.questManager.update(time, delta);
+        }
+
+        // Dust effect when moving
+        if (this.player && this.player.body && this.player.body.velocity.lengthSq() > 100) {
+            // Simple throttle
+            if (Math.random() < 0.1) {
+                this.resourceManager?.createDust(this.player.x, this.player.y + 14);
+            }
+        }
+
         if (this.pet) {
             this.pet.update(time, delta);
         }
-    }
+    } // End of update
 
     trySpawnBoss() {
         const px = this.player.x;

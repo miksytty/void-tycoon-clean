@@ -142,6 +142,33 @@ export class UIManager {
             this.renderAchievements();
         });
 
+        // Audio Controls
+        const soundBtn = document.getElementById('btn-sound');
+        if (soundBtn) {
+            // Set initial state
+            setTimeout(() => { // Wait for audio manager init
+                if (window.VoidTycoon?.audio?.isMuted) soundBtn.textContent = '🔇';
+            }, 500);
+
+            soundBtn.addEventListener('click', () => {
+                const audio = window.VoidTycoon.audio;
+                if (audio) {
+                    const muted = audio.toggleMute();
+                    soundBtn.textContent = muted ? '🔇' : '🔊';
+                    if (!muted) audio.playSFX('click');
+                }
+            });
+        }
+
+        // Global Click Sound
+        document.body.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+                // Ignore if it's the sound button itself (handled above to avoid double click when unmuring)
+                if (e.target.id === 'btn-sound' || e.target.closest('#btn-sound')) return;
+                window.VoidTycoon.audio?.playSFX('click');
+            }
+        });
+
         document.getElementById('btn-ranking')?.addEventListener('click', () => {
             this.openModal('ranking');
             this.renderRanking();
