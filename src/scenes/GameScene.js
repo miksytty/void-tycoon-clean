@@ -202,12 +202,11 @@ export class GameScene extends Phaser.Scene {
                             window.VoidTycoon.ui?.showNotification('Награда получена! +50 💎', 'success');
                             window.VoidTycoon.telegram?.hapticFeedback('success');
                         })
-                        .catch((err) => {
-                            console.log('Ad Error:', err);
-                            if (err === 'SDK_MISSING') {
+                        .catch((result) => {
+                            console.log('Ad Error:', result);
+                            alert(JSON.stringify(result));
+                            if (result === 'SDK_MISSING') {
                                 window.VoidTycoon.ui?.showNotification('Реклама недоступна (VPN?)', 'error');
-                            } else {
-                                window.VoidTycoon.ui?.showNotification('Реклама отменена или ошибка', 'warning');
                             }
                         })
                         .finally(() => {
