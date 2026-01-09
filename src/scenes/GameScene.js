@@ -204,10 +204,13 @@ export class GameScene extends Phaser.Scene {
                         })
                         .catch((result) => {
                             const currentId = window.VoidTycoon.ads?.blockId || 'unknown';
-                            console.log('Ad Error:', result);
-                            alert(`Error: ${JSON.stringify(result)}\nBlockID used: ${currentId}`);
-                            if (result === 'SDK_MISSING') {
-                                window.VoidTycoon.ui?.showNotification('Реклама недоступна (VPN?)', 'error');
+                            console.log('Ad Error:', result, 'BlockID:', currentId);
+                            // Alert removed for production
+                            if (result === 'SDK_MISSING' || result === 'SDK_LOAD_TIMEOUT') {
+                                window.VoidTycoon.ui?.showNotification('Реклама недоступна (интернет/VPN?)', 'error');
+                            } else {
+                                // On desktop or no-fill, just show a polite warning
+                                window.VoidTycoon.ui?.showNotification('Реклама пока недоступна', 'warning');
                             }
                         })
                         .finally(() => {
