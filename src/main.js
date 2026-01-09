@@ -23,7 +23,7 @@ window.VoidTycoon = {
     ui: null,
     tutorial: null,
     dailyRewards: null,
-    ads: new AdsManager('int-7521'), // Demo Block ID for testing
+    ads: new AdsManager('20849'), // Production Block ID
     localization: new LocalizationManager(),
     sound: SoundManager,
     leaderboard: leaderboardAPI,

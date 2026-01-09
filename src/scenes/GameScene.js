@@ -203,8 +203,9 @@ export class GameScene extends Phaser.Scene {
                             window.VoidTycoon.telegram?.hapticFeedback('success');
                         })
                         .catch((result) => {
+                            const currentId = window.VoidTycoon.ads?.blockId || 'unknown';
                             console.log('Ad Error:', result);
-                            alert(JSON.stringify(result));
+                            alert(`Error: ${JSON.stringify(result)}\nBlockID used: ${currentId}`);
                             if (result === 'SDK_MISSING') {
                                 window.VoidTycoon.ui?.showNotification('Реклама недоступна (VPN?)', 'error');
                             }
