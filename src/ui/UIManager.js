@@ -146,6 +146,14 @@ export class UIManager {
             this.openModal('ranking');
             this.renderRanking();
         });
+
+        // Строительство (New Button Handler)
+        document.getElementById('btn-build')?.addEventListener('click', () => {
+            this.openModal('inventory');
+            // Switch to buildings tab
+            const btn = document.querySelector('.tab-btn[data-tab="buildings"]');
+            if (btn) btn.click();
+        });
     }
 
     /**
@@ -600,7 +608,7 @@ export class UIManager {
     }
 
     /**
-     * Рендер построек
+     * Рендер построек (Selection Menu)
      */
     renderBuildings() {
         const panel = document.getElementById('buildings-panel');
@@ -609,45 +617,31 @@ export class UIManager {
         const storage = window.VoidTycoon.storage;
         if (!storage) return;
 
-        const ownedBuildings = storage.data.buildings || {};
         const resources = storage.getResources();
 
         panel.innerHTML = '';
 
         Object.values(BUILDINGS).forEach(building => {
-            const currentLevel = ownedBuildings[building.id] || 0;
-            const maxLevel = building.maxLevel;
-            const isMaxed = currentLevel >= maxLevel;
-
-            // Вычисляем стоимость следующего уровня
-            const nextLevelCost = {};
+            // New logic: Check fixed cost
             let canAfford = true;
-
-            if (!isMaxed) {
-                const multiplier = Math.pow(building.costMultiplier, currentLevel);
-                for (const [res, amount] of Object.entries(building.baseCost)) {
-                    const cost = Math.floor(amount * multiplier);
-                    nextLevelCost[res] = cost;
-                    if ((resources[res] || 0) < cost) {
-                        canAfford = false;
-                    }
+            for (const [res, amount] of Object.entries(building.cost)) {
+                if ((resources[res] || 0) < amount) {
+                    canAfford = false;
                 }
             }
 
             // Формируем описание цены
-            let costHtml = '';
-            if (isMaxed) {
-                costHtml = '<span style="color: #ffd700">⭐ MAX LEVEL</span>';
-            } else {
-                costHtml = Object.entries(nextLevelCost)
-                    .map(([res, amount]) => `${RESOURCES[res]?.icon || res} ${amount}`)
-                    .join(' ');
-            }
+            const costHtml = Object.entries(building.cost)
+                .map(([res, amount]) => `${RESOURCES[res]?.icon || res} ${amount}`)
+                .join(' ');
 
-            // Формируем описание производства
-            const prodHtml = Object.entries(building.production)
-                .map(([res, amount]) => `+${amount}/сек ${RESOURCES[res]?.icon || res}`)
-                .join(', ');
+            // Формируем описание производства (if available)
+            let prodHtml = '';
+            if (building.production) {
+                prodHtml = Object.entries(building.production)
+                    .map(([res, amount]) => `+${amount}/мин ${RESOURCES[res]?.icon || res}`)
+                    .join(', ');
+            }
 
             const buildingEl = document.createElement('div');
             buildingEl.className = `craft-recipe ${canAfford ? 'available' : ''}`;
@@ -656,20 +650,26 @@ export class UIManager {
                 <div class="recipe-header">
                     <span class="recipe-icon">${building.icon}</span>
                     <div>
-                        <div class="recipe-name">${building.name} (Уровень ${currentLevel})</div>
+                        <div class="recipe-name">${building.name}</div>
                         <div class="recipe-desc">${building.description}</div>
                          <div class="recipe-desc" style="color: #4cd137">${prodHtml}</div>
                          <div class="recipe-cost">${costHtml}</div>
                     </div>
                 </div>
-                <button class="craft-btn" ${canAfford && !isMaxed ? '' : 'disabled'}>
-                    ${isMaxed ? '✓' : (currentLevel === 0 ? '🔨 Построить' : '⬆️ Улучшить')}
+                <button class="craft-btn" ${canAfford ? '' : 'disabled'}>
+                    🔨 Разместить
                 </button>
             `;
 
-            if (canAfford && !isMaxed) {
+            if (canAfford) {
                 buildingEl.querySelector('.craft-btn').addEventListener('click', () => {
-                    this.buyBuilding(building.id, nextLevelCost);
+                    this.closeAllModals();
+                    // Toggle build mode
+                    if (window.VoidTycoon.buildManager) {
+                        window.VoidTycoon.buildManager.toggleBuildMode(building.id);
+                    } else {
+                        console.error('BuildManager not found');
+                    }
                 });
             }
 

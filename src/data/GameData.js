@@ -232,10 +232,6 @@ export const MOBS = {
         spawnChance: 0.02,
         minDistanceFromSpawn: 1500
     },
-    size: 0.6,
-    spawnChance: 0.02,
-    minDistanceFromSpawn: 1500
-},
     void_wisp: { // NEW MOB for Crystal Zone
         id: 'void_wisp',
         name: 'Р”СѓС… РџСѓСЃС‚РѕС‚С‹',
@@ -318,61 +314,6 @@ export const PROCESSING_RECIPES = {
         duration: 10000,
         xp: 5
     }
-};
-
-export const BUILDINGS = {
-    lumber_mill: {
-        id: 'lumber_mill',
-        name: 'Р›РµСЃРѕРїРёР»РєР°',
-        description: 'РђРІС‚РѕРґРѕР±С‹С‡Р° РґРµСЂРµРІР°',
-        icon: 'рџЏљпёЏ',
-        baseCost: { wood: 50 },
-        costMultiplier: 1.5,
-        production: { wood: 1 },
-        maxLevel: 10
-    },
-    quarry: {
-        id: 'quarry',
-        name: 'РљР°СЂСЊРµСЂ',
-        description: 'РђРІС‚РѕРґРѕР±С‹С‡Р° Р¶РµР»РµР·Р°',
-        icon: 'рџЏ—пёЏ',
-        baseCost: { wood: 100, iron: 50 },
-        costMultiplier: 1.6,
-        production: { iron: 0.5 },
-        maxLevel: 10
-    },
-    factory: {
-        id: 'factory',
-        name: 'Р—Р°РІРѕРґ',
-        description: 'РџРµСЂРµРїР»Р°РІРєР° Р–РµР»РµР·Р° РІ РЎС‚Р°Р»СЊ',
-        icon: 'рџЏ­',
-        baseCost: { wood: 500, iron: 300 },
-        costMultiplier: 1.8,
-        production: { steel: 0.2 },
-        consumption: { iron: 1.0 },
-        maxLevel: 5
-    },
-    lab: {
-        id: 'lab',
-        name: 'Р›Р°Р±РѕСЂР°С‚РѕСЂРёСЏ',
-        description: 'РЎРёРЅС‚РµР· РњРёРєСЂРѕС‡РёРїРѕРІ',
-        icon: 'рџ”¬',
-        baseCost: { steel: 200, crystal: 100 },
-        costMultiplier: 2.0,
-        production: { chip: 0.05 },
-        consumption: { crystal: 0.5 },
-        maxLevel: 5
-    },
-    portal: {
-        id: 'portal',
-        name: 'РџРћР РўРђР› РР—РњР•Р Р•РќРР™',
-        description: 'РўСЂРµР±СѓРµС‚СЃСЏ рџ—ќпёЏ РљР»СЋС‡ РР·РјРµСЂРµРЅРёР№ РѕС‚ Р±РѕСЃСЃРѕРІ!',
-        icon: 'рџЊЊ',
-        baseCost: { dimension_key: 1, quantum: 10 },
-        costMultiplier: 1,
-        production: {},
-    }
-    // turret and smelter removed - simplified release
 };
 
 export const SKILLS = {
@@ -498,9 +439,9 @@ export const QUEST_TEMPLATES = [
 export const BUILDINGS = {
     lumber_mill: {
         id: 'lumber_mill',
-        name: 'Лесопилка',
+        name: 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ',
         icon: '??',
-        description: 'Автоматически добывает Дерево.',
+        description: 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.',
         cost: { wood: 100 },
         production: { wood: 5 }, // +5 per minute
         productionInterval: 60000,
@@ -509,9 +450,9 @@ export const BUILDINGS = {
     },
     quarry: {
         id: 'quarry',
-        name: 'Шахта',
+        name: 'пїЅпїЅпїЅпїЅпїЅ',
         icon: '??',
-        description: 'Автоматически добывает Камень.',
+        description: 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.',
         cost: { wood: 50, iron: 50 },
         production: { iron: 3 }, // +3 per minute
         productionInterval: 60000,
@@ -520,9 +461,9 @@ export const BUILDINGS = {
     },
     smelter: {
         id: 'smelter',
-        name: 'Плавильня',
+        name: 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ',
         icon: '??',
-        description: 'Переплавляет руду в слитки.',
+        description: 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.',
         cost: { wood: 200, iron: 100 },
         production: {}, // Process based
         size: 2,
@@ -530,9 +471,9 @@ export const BUILDINGS = {
     },
     portal: {
         id: 'portal',
-        name: 'Портал Измерений',
+        name: 'пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ',
         icon: '??',
-        description: 'Путь домой. Требует Ключи.',
+        description: 'пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.',
         cost: { wood: 1000, steel: 500, crystal: 50, dimension_key: 1 },
         production: {},
         size: 3,
