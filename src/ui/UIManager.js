@@ -304,6 +304,9 @@ export class UIManager {
         // Обновляем HUD
         const scene = window.VoidTycoon.game?.scene?.getScene('GameScene');
         scene?.updateHUD();
+
+        // Analytics
+        window.VoidTycoon.analytics?.logEvent('ad_watched', { type: 'energy' });
     }
 
     /**
