@@ -184,6 +184,40 @@ export class GameScene extends Phaser.Scene {
             strokeThickness: 4,
             align: 'center'
         }).setOrigin(0.5).setScrollFactor(0).setDepth(200);
+
+        // Adsgram Button Listener
+        setTimeout(() => {
+            const adBtn = document.getElementById('btn-free-gems');
+            if (adBtn) {
+                adBtn.onclick = () => {
+                    if (!window.VoidTycoon.ads) return;
+
+                    adBtn.disabled = true;
+                    adBtn.style.opacity = '0.5';
+                    adBtn.textContent = '⏳ Loading...';
+
+                    window.VoidTycoon.ads.showRewardVideo()
+                        .then(() => {
+                            window.VoidTycoon.storage.addResource('crystal', 50);
+                            window.VoidTycoon.ui?.showNotification('Награда получена! +50 💎', 'success');
+                            window.VoidTycoon.telegram?.hapticFeedback('success');
+                        })
+                        .catch((err) => {
+                            console.log('Ad Error:', err);
+                            if (err === 'SDK_MISSING') {
+                                window.VoidTycoon.ui?.showNotification('Реклама недоступна (VPN?)', 'error');
+                            } else {
+                                window.VoidTycoon.ui?.showNotification('Реклама отменена или ошибка', 'warning');
+                            }
+                        })
+                        .finally(() => {
+                            adBtn.disabled = false;
+                            adBtn.style.opacity = '1';
+                            adBtn.textContent = '💎 Free (+50)';
+                        });
+                };
+            }
+        }, 1000); // Wait for DOM
     }
 
     updateHUD() {
