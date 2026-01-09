@@ -75,12 +75,12 @@ export class SocialManager {
 
         try {
             // Fetch 'referral_join' events where referrer_id matches myId
-            // note: 'data' is a JSONB column in 'events' table
+            // Using correct columns: event_name, event_data
             const { data, error } = await window.VoidTycoon.leaderboard.client
                 .from('events')
-                .select('data, created_at')
-                .eq('event_type', 'referral_join')
-                .contains('data', { referrer_id: String(myId) })
+                .select('event_data, created_at')
+                .eq('event_name', 'referral_join')
+                .contains('event_data', { referrer_id: String(myId) })
                 .order('created_at', { ascending: false })
                 .limit(50);
 
@@ -91,7 +91,7 @@ export class SocialManager {
 
             // Map to cleaner format
             return data.map(row => ({
-                username: row.data.referee_username || 'Unknown',
+                username: row.event_data.referee_username || 'Unknown',
                 date: new Date(row.created_at).toLocaleDateString()
             }));
 
