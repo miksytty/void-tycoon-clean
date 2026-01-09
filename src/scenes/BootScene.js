@@ -13,7 +13,12 @@ export class BootScene extends Phaser.Scene {
     }
 
     preload() {
-        // Load nothing - we generate everything!
+        // Load assets
+        this.load.image('lumber_mill', 'assets/buildings/lumber_mill.png');
+        this.load.image('quarry', 'assets/buildings/quarry.png');
+        this.load.image('smelter', 'assets/buildings/smelter.png');
+
+        // Load nothing - we generate everything else!
     }
 
     create() {

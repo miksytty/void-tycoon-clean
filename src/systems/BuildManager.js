@@ -63,14 +63,21 @@ export class BuildManager {
                 .setDepth(1000);
 
             // If sprite not found, use fallback or create texture
-            if (!this.scene.textures.exists('building_base')) {
-                // Create a simple box texture on the fly if needed, or use 'player' as placeholder
+            // ... (fallback logic remains if needed, but we prioritize loaded assets) ...
+
+            const textureKey = this.scene.textures.exists(buildingId) ? buildingId : 'building_base';
+
+            if (!this.scene.textures.exists(textureKey) && !this.scene.textures.exists('building_base')) {
+                // Create a simple box texture on the fly if needed
                 const graphics = this.scene.make.graphics({ x: 0, y: 0, add: false });
                 graphics.fillStyle(0xffffff);
                 graphics.fillRect(0, 0, 32, 32);
                 graphics.generateTexture('building_base', 32, 32);
             }
-            this.previewSprite.setTexture('building_base');
+            this.previewSprite.setTexture(textureKey);
+        } else {
+            const textureKey = this.scene.textures.exists(buildingId) ? buildingId : 'building_base';
+            this.previewSprite.setTexture(textureKey);
         }
 
         this.previewSprite.setVisible(true);
@@ -159,7 +166,9 @@ export class BuildManager {
         const config = BUILDINGS[type];
 
         // Create sprite
-        const building = this.builtBuildingsGroup.create(x, y, 'building_base');
+        // Create sprite
+        const textureKey = this.scene.textures.exists(config.id) ? config.id : 'building_base';
+        const building = this.builtBuildingsGroup.create(x, y, textureKey);
 
         // Visuals
         if (config.color) building.setTint(config.color);
