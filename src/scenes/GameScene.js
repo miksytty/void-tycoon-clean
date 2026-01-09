@@ -9,6 +9,7 @@ import { VirtualJoystick } from '../ui/VirtualJoystick.js';
 import { Pet } from '../entities/Pet.js';
 import { BuildManager } from '../systems/BuildManager.js';
 import { QuestManager } from '../systems/QuestManager.js';
+import { PortalManager } from '../systems/PortalManager.js';
 
 export class GameScene extends Phaser.Scene {
     constructor() {
@@ -68,6 +69,11 @@ export class GameScene extends Phaser.Scene {
         this.questManager = new QuestManager();
         this.questManager.init();
         window.VoidTycoon.questManager = this.questManager;
+
+        // Portal Manager (Endgame)
+        this.portalManager = new PortalManager(this);
+        this.portalManager.init();
+        window.VoidTycoon.portalManager = this.portalManager;
 
         // loadBuiltTurrets removed - turrets disabled
         this.checkPetSpawn();
@@ -248,7 +254,14 @@ export class GameScene extends Phaser.Scene {
         document.querySelector('#res-iron .res-count').textContent = resources.iron;
         document.querySelector('#res-crystal .res-count').textContent = resources.crystal;
 
-        document.getElementById('player-level').textContent = player.level;
+        // Show prestige multiplier if > 0
+        const prestigeLevel = player.prestigeLevel || 0;
+        const prestigeMult = player.prestigeMultiplier || 1;
+        if (prestigeLevel > 0) {
+            document.getElementById('player-level').textContent = `${player.level} ✨x${prestigeMult.toFixed(1)}`;
+        } else {
+            document.getElementById('player-level').textContent = player.level;
+        }
 
         const xpForNext = storage.getXPForLevel(player.level + 1);
         const xpPercent = (player.xp / xpForNext) * 100;
@@ -260,13 +273,19 @@ export class GameScene extends Phaser.Scene {
 
         // Update Objective
         if (this.objectiveText) {
-            const hasKey = (resources.dimension_key || 0) > 0;
-            if (hasKey) {
-                this.objectiveText.setText('Цель: Построить ПОРТАЛ ИЗМЕРЕНИЙ 🌌');
+            const portalStage = storage.data.portalStage || 0;
+            if (portalStage >= 4) {
+                this.objectiveText.setText('Цель: Активировать ПОРТАЛ 🌌');
+                this.objectiveText.setColor('#ea80fc');
+            } else if (portalStage > 0) {
+                this.objectiveText.setText('Цель: Достроить ПОРТАЛ 🏗️');
                 this.objectiveText.setColor('#00ffff');
-            } else {
-                this.objectiveText.setText('Цель: Найти Босса и выбить Ключ 👹');
+            } else if (player.level >= 10) {
+                this.objectiveText.setText('Цель: Найти место для ПОРТАЛА 📍');
                 this.objectiveText.setColor('#ffd700');
+            } else {
+                this.objectiveText.setText('Цель: Качаться до 10 уровня ⚔️');
+                this.objectiveText.setColor('#ffffff');
             }
         }
 

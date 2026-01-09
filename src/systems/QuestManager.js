@@ -260,6 +260,11 @@ export class QuestManager {
 
         storage.save();
 
+        // Level 10: Unlock Portal
+        if (newLevel === 10) {
+            window.VoidTycoon.portalManager?.startPortal();
+        }
+
         // Haptic feedback
         if (window.Telegram?.WebApp?.HapticFeedback) {
             window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');

@@ -34,7 +34,8 @@ export class StorageManager {
                 steel: 0,
                 crystal: 0,
                 chip: 0,
-                quantum: 0
+                quantum: 0,
+                dimension_key: 0
             },
             inventory: new Array(20).fill(null),
             equipped: {
@@ -79,6 +80,7 @@ export class StorageManager {
                 turret: 0
             },
             placedBuildings: [], // Array of { id, type, x, y, lastProduction }
+            portalStage: 0, // 0-4 (0=not built, 4=100% complete)
             skills: {
                 speed: 0,
                 efficiency: 0,
