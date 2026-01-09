@@ -22,6 +22,7 @@ export class GameScene extends Phaser.Scene {
         this.bosses = [];
         // turrets removed
         this.lastBossSpawnCheck = 0;
+        this.lastEnergyRegen = 0;
     }
 
     create() {
@@ -537,6 +538,22 @@ export class GameScene extends Phaser.Scene {
         if (time > this.lastIncomeTime + 1000) {
             this.processPassiveIncome();
             this.lastIncomeTime = time;
+        }
+
+        // Passive Energy Regeneration (When standing still & not acting)
+        if (!this.isGathering && !gatherPressed && this.player.body.velocity.length() < 5) {
+            if (time > this.lastEnergyRegen + 1000) {
+                const storage = window.VoidTycoon.storage;
+                if (storage.data.player.energy < storage.data.player.maxEnergy) {
+                    storage.data.player.energy += 1;
+                    // Optional: Floating text for regen (maybe too spammy?)
+                    // this.showRewardText(1, 'energy'); 
+                }
+                this.lastEnergyRegen = time;
+            }
+        } else {
+            // Reset timer so we wait a full second after stopping
+            this.lastEnergyRegen = time;
         }
 
         // OPTIMIZATION: Update HUD less frequently (e.g. every 500ms)

@@ -94,7 +94,9 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
 
         const storage = window.VoidTycoon?.storage;
         if (storage) {
-            storage.data.player.energy = Math.max(0, storage.data.player.energy - this.damage);
+            // Balance: Reduced energy damage by 40% (User Request)
+            const reducedDamage = Math.max(1, Math.floor(this.damage * 0.6));
+            storage.data.player.energy = Math.max(0, storage.data.player.energy - reducedDamage);
             storage.save();
 
             const scene = window.VoidTycoon.game?.scene?.getScene('GameScene');
