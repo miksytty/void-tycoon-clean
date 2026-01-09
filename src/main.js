@@ -13,25 +13,26 @@ import { leaderboardAPI } from './core/SupabaseClient.js';
 import { initSecurity } from './systems/Security.js';
 import { AudioManager } from './core/AudioManager.js';
 import { SocialManager } from './core/SocialManager.js';
+import { LeaderboardManager } from './core/LeaderboardManager.js';
 
-// Initialize global managers
-import './styles/premium-effects.css'; // 🎨 Premium Visual Effects
+import './styles/premium-effects.css';
 
+// Global State
 window.VoidTycoon = {
     telegram: null,
     storage: null,
     ui: null,
     tutorial: null,
     dailyRewards: null,
-    ads: new AdsManager('20849'), // Production Block ID
+    ads: new AdsManager('20849'),
     localization: new LocalizationManager(),
-    audio: new AudioManager(), // New robust audio
-    social: new SocialManager(), // Referral & Socials
+    audio: new AudioManager(),
+    social: new SocialManager(),
     leaderboard: leaderboardAPI,
+    leaderboardManager: null,
     game: null
 };
 
-// Initialize localization
 window.VoidTycoon.localization.init();
 
 async function initApp() {
@@ -47,9 +48,10 @@ async function initApp() {
         window.VoidTycoon.ui = new UIManager();
         window.VoidTycoon.tutorial = new TutorialManager();
         window.VoidTycoon.dailyRewards = new DailyRewardsManager();
-
-        // Init Social Manager (Referrals)
         window.VoidTycoon.social.init();
+
+        // Init Leaderboard Manager
+        window.VoidTycoon.leaderboardManager = new LeaderboardManager();
 
         const config = {
             type: Phaser.AUTO,
@@ -76,6 +78,7 @@ async function initApp() {
     }
 }
 
+// Helpers
 function updateLoadingText(text) {
     const loadText = document.getElementById('load-text');
     if (loadText) loadText.textContent = text;
@@ -85,13 +88,5 @@ window.updateLoadProgress = function (progress) {
     const progressBar = document.getElementById('load-progress');
     if (progressBar) progressBar.style.width = `${progress * 100}%`;
 };
-
-function hideLoadingScreen() {
-    const loadingScreen = document.getElementById('loading-screen');
-    if (loadingScreen) {
-        loadingScreen.style.opacity = '0';
-        setTimeout(() => loadingScreen.style.display = 'none', 500);
-    }
-}
 
 document.addEventListener('DOMContentLoaded', initApp);

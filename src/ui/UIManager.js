@@ -2056,4 +2056,62 @@ export class UIManager {
             if (e.target === overlay) overlay.remove();
         });
     }
+
+    async renderRanking() {
+        const container = document.getElementById('ranking-list');
+        if (!container) return;
+
+        container.innerHTML = '<div style="text-align:center; padding:20px;">Загрузка...</div>';
+
+        const manager = window.VoidTycoon.leaderboardManager;
+        let players = [];
+
+        if (manager) {
+            players = await manager.getTopPlayers(10);
+        }
+
+        container.innerHTML = '';
+
+        if (!players || players.length === 0) {
+            container.innerHTML = '<div style="text-align:center; opacity:0.6; padding:20px;">Пока нет данных</div>';
+
+            // Add fake data if empty (for demo)
+            // players = [{username: 'DevHost', xp: 9999}, {username: 'PlayerOne', xp: 5000}];
+            if (players.length === 0) return;
+        }
+
+        const myId = window.VoidTycoon?.telegram?.getUserId();
+
+        players.forEach((p, index) => {
+            // Check if user_id matches
+            const isMe = p.user_id && String(p.user_id) === String(myId);
+            const rank = index + 1;
+
+            let name = p.username || 'Unknown';
+            if (name.length > 15) name = name.substring(0, 15) + '...';
+
+            let rankIcon = `<span style="color:#888;">#${rank}</span>`;
+            if (rank === 1) rankIcon = '🥇';
+            if (rank === 2) rankIcon = '🥈';
+            if (rank === 3) rankIcon = '🥉';
+
+            const item = document.createElement('div');
+            item.style.cssText = `
+                display: flex; justify-content: space-between; align-items: center;
+                background: ${isMe ? 'rgba(108, 92, 231, 0.3)' : 'rgba(255, 255, 255, 0.05)'};
+                padding: 12px; border-radius: 10px; margin-bottom: 6px;
+                border: ${isMe ? '1px solid #6c5ce7' : '1px solid rgba(255,255,255,0.05)'};
+            `;
+
+            item.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-weight: bold; width: 24px; text-align: center; font-size: 1.2rem;">${rankIcon}</span>
+                    <span style="${isMe ? 'color: #a29bfe; font-weight: bold;' : 'color: #eee;'}">${name}</span>
+                </div>
+                <span style="color: #ffd700; font-weight: bold; font-family: monospace; font-size: 1.1rem;">${this.formatNumber(p.xp)} XP</span>
+            `;
+
+            container.appendChild(item);
+        });
+    }
 }

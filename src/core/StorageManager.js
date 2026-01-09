@@ -278,16 +278,9 @@ export class StorageManager {
             localStorage.setItem(LOCAL_KEY_PREFIX + 'gameData', dataStr);
         } catch (error) { }
 
-        const now = Date.now();
-        if (!this.lastLeaderboardSync || now - this.lastLeaderboardSync > 60000) {
-            this.lastLeaderboardSync = now;
-            const userId = this.telegram?.getUserId();
-            const username = this.telegram?.getUsername();
-            const totalXP = this.data.stats.totalXP || this.data.player.xp;
-
-            if (userId && window.VoidTycoon?.leaderboard) {
-                window.VoidTycoon.leaderboard.syncScore(userId, username, totalXP);
-            }
+        // Create async save to leaderboard (fire and forget)
+        if (window.VoidTycoon?.leaderboardManager) {
+            window.VoidTycoon.leaderboardManager.saveScore(this.data.stats.totalXP || this.data.player.xp);
         }
     }
 
