@@ -80,6 +80,11 @@ export class BuildManager {
             this.previewSprite.setTexture(textureKey);
         }
 
+        // Scale preview
+        const targetSize = (config.size || 2) * 32;
+        const scale = targetSize / Math.max(this.previewSprite.width, this.previewSprite.height);
+        this.previewSprite.setScale(scale);
+
         this.previewSprite.setVisible(true);
         if (config.color) this.previewSprite.setTint(config.color);
 
@@ -169,6 +174,12 @@ export class BuildManager {
         // Create sprite
         const textureKey = this.scene.textures.exists(config.id) ? config.id : 'building_base';
         const building = this.builtBuildingsGroup.create(x, y, textureKey);
+
+        // Scale to fit tile size (e.g. size 2 = 64x64)
+        const targetSize = (config.size || 2) * 32;
+        // Use the larger dimension to fit
+        const scale = targetSize / Math.max(building.width, building.height);
+        building.setScale(scale);
 
         // Visuals
         if (config.color) building.setTint(config.color);
