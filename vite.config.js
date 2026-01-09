@@ -28,8 +28,9 @@ export default defineConfig({
         }
       },
       plugins: [
+        /*
         obfuscatorPlugin({
-          include: ['src/**/*.js'],
+          include: ['src/!**!/!*.js'],
           exclude: [/node_modules/],
           options: {
             compact: true,
@@ -63,6 +64,7 @@ export default defineConfig({
             unicodeEscapeSequence: false
           }
         })
+        */
       ]
     }
   },
