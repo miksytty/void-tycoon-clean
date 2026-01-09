@@ -125,7 +125,13 @@ body {
     z-index: 100;
 }
 
+/* Ensure children have pointer events */
 #ui-overlay>* {
+    pointer-events: auto;
+}
+
+/* Make HUD children clickable */
+#hud>* {
     pointer-events: auto;
 }
 
@@ -139,6 +145,10 @@ body {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    z-index: 2000;
+    /* Ensure HUD is very high */
+    pointer-events: none;
+    /* Let clicks pass through empty space */
 }
 
 #player-info {
@@ -582,6 +592,12 @@ body {
     flex-direction: column;
     gap: 10px;
     pointer-events: none;
+    align-items: center;
+    /* Center notifications horizontally */
+    width: 100%;
+    /* Full width for centering context */
+    top: 15%;
+    /* Move down slightly to avoid hud overlap */
 }
 
 .notification {
@@ -597,6 +613,10 @@ body {
     gap: 10px;
     animation: notifyIn 0.3s ease, notifyOut 0.3s ease 2.5s forwards;
     box-shadow: var(--shadow);
+    /* Add background semi-transparent overlay for readability */
+    background: rgba(15, 23, 42, 0.9);
+    z-index: 3000;
+    /* Above everything */
 }
 
 .notification.success {
