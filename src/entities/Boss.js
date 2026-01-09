@@ -2,10 +2,13 @@ import Phaser from 'phaser';
 
 export class Boss extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y, config) {
-        super(scene, x, y, 'boss');
+        // Use configured texture or default 'boss' (or fallback to color-tinted logic if texture missing)
+        super(scene, x, y, config.texture || 'boss');
 
         this.scene = scene;
         this.config = config;
+        this.isBoss = !!config.isBoss; // Flag to distinguish boss from mob
+
         this.hp = config.hp;
         this.maxHp = config.hp;
         this.damage = config.damage;
@@ -102,6 +105,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     }
 
     updateScreenDarkness(distance) {
+        if (!this.isBoss) return; // Optimization: Mobs don't have aura
         // Create darkness overlay if not exists
         if (!this.darknessOverlay) {
             this.darknessOverlay = this.scene.add.rectangle(

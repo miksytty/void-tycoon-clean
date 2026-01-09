@@ -161,7 +161,9 @@ export const BOSSES = {
         color: 0x4caf50,
         size: 1.5,
         spawnChance: 0.005,
-        minDistanceFromSpawn: 400
+        minDistanceFromSpawn: 400,
+        isBoss: true,
+        texture: 'boss' // Use new detailed texture
     },
     crystal_golem: {
         id: 'crystal_golem',
@@ -180,7 +182,9 @@ export const BOSSES = {
         color: 0x607d8b,
         size: 2.0,
         spawnChance: 0.003,
-        minDistanceFromSpawn: 1500 // In Wasteland
+        minDistanceFromSpawn: 1500, // In Wasteland
+        isBoss: true,
+        texture: 'boss'
     },
     void_lord: {
         id: 'void_lord',
@@ -199,7 +203,9 @@ export const BOSSES = {
         color: 0x9c27b0,
         size: 3.0,
         spawnChance: 0.001,
-        minDistanceFromSpawn: 3500 // In Crystal Zone
+        minDistanceFromSpawn: 3500, // In Crystal Zone
+        isBoss: true,
+        texture: 'boss'
     }
 };
 
@@ -217,9 +223,10 @@ export const MOBS = {
         drops: ['wood'],
         xpReward: 5,
         color: 0x8bc34a,
-        size: 0.8,
+        size: 1.0,
         spawnChance: 0.03,
-        minDistanceFromSpawn: 200
+        minDistanceFromSpawn: 200,
+        texture: 'mob_slime'
     },
     bat: {
         id: 'bat',
@@ -232,11 +239,12 @@ export const MOBS = {
         attackRange: 30,
         dropChance: 0.4,
         drops: ['iron'],
-        xpReward: 25,
-        color: 0xe53935,
-        size: 0.6,
+        xpReward: 15,
+        color: 0xff5252,
+        size: 1.0,
         spawnChance: 0.02,
-        minDistanceFromSpawn: 1500
+        minDistanceFromSpawn: 1000,
+        texture: 'mob_bat'
     },
     void_wisp: { // NEW MOB for Crystal Zone
         id: 'void_wisp',

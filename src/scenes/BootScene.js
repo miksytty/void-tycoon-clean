@@ -37,7 +37,8 @@ export class BootScene extends Phaser.Scene {
         this.createCrystalGroundTexture();
         this.createParticleTextures();
         this.createBossTexture();
-        this.createBuildingTextures(); // NEW
+        this.createBuildingTextures();
+        this.createMobTextures(); // NEW mob sprites
     }
 
     // ... existing methods ...
@@ -290,26 +291,88 @@ export class BootScene extends Phaser.Scene {
         g.generateTexture('particle_crystal', 4, 4);
     }
 
+    createMobTextures() {
+        const g = this.make.graphics({ x: 0, y: 0, add: false });
+
+        // --- SLIME ---
+        g.clear();
+        g.fillStyle(0x00ff00); // Inner body
+        g.fillCircle(16, 20, 12);
+        g.fillStyle(0xccffcc); // Highlight
+        g.fillCircle(12, 16, 4);
+        g.fillStyle(0x000000); // Eyes
+        g.fillCircle(12, 18, 2);
+        g.fillCircle(20, 18, 2);
+        g.generateTexture('mob_slime', 32, 32);
+
+        // --- BAT ---
+        g.clear();
+        g.fillStyle(0x303030); // Body
+        g.fillCircle(16, 16, 8);
+        g.beginPath(); // Wings
+        g.moveTo(8, 16);
+        g.lineTo(0, 8);
+        g.lineTo(8, 20);
+        g.moveTo(24, 16);
+        g.lineTo(32, 8);
+        g.lineTo(24, 20);
+        g.fillPath();
+        g.fillStyle(0xff0000); // Red eyes
+        g.fillRect(14, 14, 1, 1);
+        g.fillRect(17, 14, 1, 1);
+        g.generateTexture('mob_bat', 32, 32);
+
+        // --- GOBLIN ---
+        g.clear();
+        g.fillStyle(0x2e7d32); // Skin
+        g.fillRect(10, 8, 12, 10); // Head
+        g.fillRect(8, 18, 16, 14); // Body
+        g.fillStyle(0x558b2f); // Ears
+        g.fillTriangle(10, 12, 4, 8, 10, 16);
+        g.fillTriangle(22, 12, 28, 8, 22, 16);
+        g.fillStyle(0xffffff); // Eyes
+        g.fillRect(12, 10, 3, 3);
+        g.fillRect(17, 10, 3, 3);
+        g.fillStyle(0x000000); // Pupils
+        g.fillRect(13, 11, 1, 1);
+        g.fillRect(18, 11, 1, 1);
+        g.generateTexture('mob_goblin', 32, 32);
+
+        g.destroy();
+    }
+
     createBossTexture() {
         const g = this.make.graphics({ x: 0, y: 0, add: false });
 
-        g.fillStyle(0x1a1a2e);
-        g.fillRect(8, 8, 16, 20);
+        // --- BOSS (Improved) ---
+        // Dark Aura
+        g.fillStyle(0x1a0033);
+        g.fillCircle(32, 32, 30);
 
+        // Spikes
+        g.fillStyle(0x4a148c);
+        for (let i = 0; i < 8; i++) {
+            const angle = (i / 8) * Math.PI * 2;
+            const x = 32 + Math.cos(angle) * 32;
+            const y = 32 + Math.sin(angle) * 32;
+            g.fillCircle(x, y, 6);
+        }
+
+        // Core
         g.fillStyle(0xff0000);
-        g.fillRect(10, 12, 4, 4);
-        g.fillRect(18, 12, 4, 4);
+        g.fillCircle(32, 32, 15);
+        g.fillStyle(0xffa0a0);
+        g.fillCircle(28, 28, 5); // Shine
 
-        g.fillStyle(0x4a0000);
-        g.fillRect(12, 4, 8, 6);
-        g.fillRect(8, 6, 4, 4);
-        g.fillRect(20, 6, 4, 4);
+        // Evil Eyes
+        g.fillStyle(0xffff00);
+        g.beginPath();
+        g.moveTo(24, 28); g.lineTo(28, 32); g.lineTo(24, 34);
+        g.moveTo(40, 28); g.lineTo(36, 32); g.lineTo(40, 34);
+        g.fillPath();
 
-        g.fillStyle(0x2d2d44);
-        g.fillRect(6, 14, 4, 10);
-        g.fillRect(22, 14, 4, 10);
-
-        g.generateTexture('boss', 32, 32);
+        g.generateTexture('boss', 64, 64);
+        g.destroy();
     }
 
     createBuildingTextures() {
