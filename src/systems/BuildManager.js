@@ -58,35 +58,15 @@ export class BuildManager {
         const config = BUILDINGS[buildingId];
 
         if (!this.previewSprite) {
-            this.previewSprite = this.scene.add.sprite(0, 0, 'building_base')
+            this.previewSprite = this.scene.add.sprite(0, 0, buildingId)
                 .setAlpha(0.6)
                 .setDepth(1000);
-
-            // If sprite not found, use fallback or create texture
-            // ... (fallback logic remains if needed, but we prioritize loaded assets) ...
-
-            const textureKey = this.scene.textures.exists(buildingId) ? buildingId : 'building_base';
-
-            if (!this.scene.textures.exists(textureKey) && !this.scene.textures.exists('building_base')) {
-                // Create a simple box texture on the fly if needed
-                const graphics = this.scene.make.graphics({ x: 0, y: 0, add: false });
-                graphics.fillStyle(0xffffff);
-                graphics.fillRect(0, 0, 32, 32);
-                graphics.generateTexture('building_base', 32, 32);
-            }
-            this.previewSprite.setTexture(textureKey);
         } else {
             const textureKey = this.scene.textures.exists(buildingId) ? buildingId : 'building_base';
             this.previewSprite.setTexture(textureKey);
         }
 
-        // Scale preview
-        const targetSize = (config.size || 2) * 32;
-        const scale = targetSize / Math.max(this.previewSprite.width, this.previewSprite.height);
-        this.previewSprite.setScale(scale);
-
         this.previewSprite.setVisible(true);
-        if (config.color) this.previewSprite.setTint(config.color);
 
         window.VoidTycoon.ui?.showNotification(`Режим строительства: ${config.name}`, 'info');
     }
@@ -170,19 +150,13 @@ export class BuildManager {
     placeBuildingEntity(type, x, y) {
         const config = BUILDINGS[type];
 
-        // Create sprite
-        // Create sprite
-        const textureKey = this.scene.textures.exists(config.id) ? config.id : 'building_base';
+        // Create sprite using procedurally generated texture
+        const textureKey = this.scene.textures.exists(type) ? type : 'building_base';
         const building = this.builtBuildingsGroup.create(x, y, textureKey);
 
-        // Scale to fit tile size (e.g. size 2 = 64x64)
-        const targetSize = (config.size || 2) * 32;
-        // Use the larger dimension to fit
-        const scale = targetSize / Math.max(building.width, building.height);
-        building.setScale(scale);
+        // No scaling needed - procedural textures are correct size
 
         // Visuals
-        if (config.color) building.setTint(config.color);
         building.setDepth(y); // Y-sort
         building.setImmovable(true);
 

@@ -13,12 +13,7 @@ export class BootScene extends Phaser.Scene {
     }
 
     preload() {
-        // Load assets
-        this.load.image('lumber_mill', 'assets/buildings/lumber_mill.png');
-        this.load.image('quarry', 'assets/buildings/quarry.png');
-        this.load.image('smelter', 'assets/buildings/smelter.png');
-
-        // Load nothing - we generate everything else!
+        // All assets are generated procedurally!
     }
 
     create() {
@@ -42,6 +37,7 @@ export class BootScene extends Phaser.Scene {
         this.createCrystalGroundTexture();
         this.createParticleTextures();
         this.createBossTexture();
+        this.createBuildingTextures(); // NEW
     }
 
     // ... existing methods ...
@@ -314,5 +310,86 @@ export class BootScene extends Phaser.Scene {
         g.fillRect(22, 14, 4, 10);
 
         g.generateTexture('boss', 32, 32);
+    }
+
+    createBuildingTextures() {
+        // Lumber Mill - wooden hut with logs
+        const lm = this.make.graphics({ x: 0, y: 0, add: false });
+        // Base structure
+        lm.fillStyle(0x8d6e63);
+        lm.fillRect(8, 20, 48, 40);
+        // Roof
+        lm.fillStyle(0x5d4037);
+        lm.fillRect(4, 10, 56, 14);
+        lm.fillRect(12, 4, 40, 10);
+        // Door
+        lm.fillStyle(0x3e2723);
+        lm.fillRect(26, 36, 12, 24);
+        // Window
+        lm.fillStyle(0x81d4fa);
+        lm.fillRect(40, 28, 10, 10);
+        // Logs pile
+        lm.fillStyle(0xa1887f);
+        lm.fillRect(4, 50, 16, 8);
+        lm.fillRect(6, 44, 12, 8);
+        lm.generateTexture('lumber_mill', 64, 64);
+
+        // Quarry - stone mine entrance
+        const qu = this.make.graphics({ x: 0, y: 0, add: false });
+        // Stone base
+        qu.fillStyle(0x78909c);
+        qu.fillRect(8, 24, 48, 36);
+        // Dark entrance
+        qu.fillStyle(0x263238);
+        qu.fillRect(20, 32, 24, 28);
+        // Support beams
+        qu.fillStyle(0x5d4037);
+        qu.fillRect(16, 24, 6, 36);
+        qu.fillRect(42, 24, 6, 36);
+        qu.fillRect(16, 20, 32, 6);
+        // Ore pile
+        qu.fillStyle(0xffb74d);
+        qu.fillRect(50, 48, 10, 8);
+        qu.fillRect(52, 42, 6, 8);
+        qu.generateTexture('quarry', 64, 64);
+
+        // Smelter - furnace with fire
+        const sm = this.make.graphics({ x: 0, y: 0, add: false });
+        // Brick base
+        sm.fillStyle(0xbf360c);
+        sm.fillRect(12, 16, 40, 44);
+        // Chimney
+        sm.fillStyle(0x8d6e63);
+        sm.fillRect(36, 4, 12, 16);
+        // Fire opening
+        sm.fillStyle(0xff6f00);
+        sm.fillRect(20, 40, 24, 16);
+        // Fire glow
+        sm.fillStyle(0xffeb3b);
+        sm.fillRect(26, 44, 12, 8);
+        // Smoke particles (decorative)
+        sm.fillStyle(0x9e9e9e);
+        sm.fillRect(40, 0, 4, 6);
+        sm.fillRect(38, 6, 4, 4);
+        sm.generateTexture('smelter', 64, 64);
+
+        // Portal - magical gate
+        const pt = this.make.graphics({ x: 0, y: 0, add: false });
+        // Stone frame
+        pt.fillStyle(0x4a148c);
+        pt.fillRect(20, 8, 56, 80);
+        // Inner glow
+        pt.fillStyle(0x7c4dff);
+        pt.fillRect(28, 16, 40, 64);
+        // Swirl center
+        pt.fillStyle(0xea80fc);
+        pt.fillRect(40, 36, 16, 24);
+        // Runes
+        pt.fillStyle(0xffeb3b);
+        pt.fillRect(22, 20, 4, 8);
+        pt.fillRect(70, 20, 4, 8);
+        pt.fillRect(22, 64, 4, 8);
+        pt.fillRect(70, 64, 4, 8);
+        pt.generateTexture('portal', 96, 96);
     }
 }
