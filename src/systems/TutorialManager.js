@@ -221,5 +221,7 @@ export class TutorialManager {
         // Показываем приветствие
         window.VoidTycoon.ui?.showNotification('🎮 Удачной игры!', 'success');
         window.VoidTycoon.telegram?.hapticFeedback('success');
+
+        window.VoidTycoon?.analytics?.logEvent('tutorial_complete');
     }
 }

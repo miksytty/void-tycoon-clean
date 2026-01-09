@@ -20,6 +20,23 @@
   <script src="https://adsgram.ai/js/sdk.js"></script>
 
   <link rel="stylesheet" href="/src/styles/main.css">
+  <style>
+    body {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+
+    #ui-overlay {
+      top: env(safe-area-inset-top);
+      bottom: env(safe-area-inset-bottom);
+      left: env(safe-area-inset-left);
+      right: env(safe-area-inset-right);
+      width: auto;
+      height: auto;
+    }
+  </style>
 </head>
 
 <body>
@@ -259,9 +276,14 @@
         </div>
 
         <button id="btn-reset-progress"
-          style="width: 100%; padding: 12px; background: #e74c3c; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+          style="width: 100%; padding: 12px; background: #2d3436; color: #ff7675; border: 1px solid #ff7675; border-radius: 8px; font-weight: bold; cursor: pointer;">
           🔴 Сбросить прогресс
         </button>
+
+        <a href="https://t.me/VoidTycoonSupportBot" target="_blank"
+          style="display:block; text-align:center; margin-top:10px; padding: 12px; background: rgba(52, 152, 219, 0.2); color: #3498db; border: 1px solid #3498db; border-radius: 8px; font-weight: bold; text-decoration: none;">
+          🐛 Report Bug / Support
+        </a>
       </div>
       <div class="settings-footer">
         <div class="version-info">Ver: 1.0 Release</div>

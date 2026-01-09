@@ -2114,4 +2114,8 @@ export class UIManager {
             container.appendChild(item);
         });
     }
+
+    get hasOpenModals() {
+        return document.querySelectorAll('.modal:not(.hidden)').length > 0 || document.getElementById('quests-modal-overlay');
+    }
 }

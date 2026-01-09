@@ -514,6 +514,12 @@ export class GameScene extends Phaser.Scene {
     }
 
     update(time, delta) {
+        // Pause game logic if UI modals are open (Shop, Settings, etc.)
+        if (window.VoidTycoon?.ui?.hasOpenModals) {
+            if (this.player?.body) this.player.body.setVelocity(0, 0);
+            return;
+        }
+
         let joystickInput = { x: 0, y: 0, active: false };
         if (this.virtualJoystick) {
             const vector = this.virtualJoystick.getVector();

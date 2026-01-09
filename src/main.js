@@ -14,6 +14,7 @@ import { initSecurity } from './systems/Security.js';
 import { AudioManager } from './core/AudioManager.js';
 import { SocialManager } from './core/SocialManager.js';
 import { LeaderboardManager } from './core/LeaderboardManager.js';
+import { AnalyticsManager } from './core/AnalyticsManager.js';
 
 import './styles/premium-effects.css';
 
@@ -29,7 +30,8 @@ window.VoidTycoon = {
     audio: new AudioManager(),
     social: new SocialManager(),
     leaderboard: leaderboardAPI,
-    leaderboardManager: null,
+    leaderboardManager: null, // High level manager
+    analytics: null, // Init later to ensure client ready
     game: null
 };
 
@@ -44,6 +46,9 @@ async function initApp() {
 
         window.VoidTycoon.storage = new StorageManager(window.VoidTycoon.telegram);
         await window.VoidTycoon.storage.init();
+
+        // Init Analytics early to capture load if needed, but it needs client
+        window.VoidTycoon.analytics = new AnalyticsManager();
 
         window.VoidTycoon.ui = new UIManager();
         window.VoidTycoon.tutorial = new TutorialManager();
