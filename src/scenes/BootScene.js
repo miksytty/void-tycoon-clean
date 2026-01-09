@@ -6,10 +6,38 @@
  */
 
 import Phaser from 'phaser';
+import { SPRITES, PALETTES } from '../data/PixelArt.js';
 
 export class BootScene extends Phaser.Scene {
     constructor() {
         super({ key: 'BootScene' });
+    }
+
+    // Helper: Draws pixel art from matrix
+    createPixelTexture(key, matrix, palette, scale = 2) {
+        if (!matrix || !palette) return;
+
+        const pixelSize = scale;
+        const width = matrix[0].length * pixelSize;
+        const height = matrix.length * pixelSize;
+
+        const g = this.make.graphics({ x: 0, y: 0, add: false });
+
+        for (let y = 0; y < matrix.length; y++) {
+            for (let x = 0; x < matrix[y].length; x++) {
+                const colorCode = matrix[y][x];
+                if (colorCode !== 0) {
+                    const color = palette[colorCode];
+                    if (color !== undefined) {
+                        g.fillStyle(color);
+                        g.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+                    }
+                }
+            }
+        }
+
+        g.generateTexture(key, width, height);
+        g.destroy();
     }
 
     preload() {
@@ -292,87 +320,25 @@ export class BootScene extends Phaser.Scene {
     }
 
     createMobTextures() {
-        const g = this.make.graphics({ x: 0, y: 0, add: false });
+        // High quality pixel art mobs
+        this.createPixelTexture('mob_slime', SPRITES.slime, PALETTES.slime, 2);
+        this.createPixelTexture('mob_bat', SPRITES.bat, PALETTES.bat, 2);
 
-        // --- SLIME ---
-        g.clear();
-        g.fillStyle(0x00ff00); // Inner body
-        g.fillCircle(16, 20, 12);
-        g.fillStyle(0xccffcc); // Highlight
-        g.fillCircle(12, 16, 4);
-        g.fillStyle(0x000000); // Eyes
-        g.fillCircle(12, 18, 2);
-        g.fillCircle(20, 18, 2);
-        g.generateTexture('mob_slime', 32, 32);
-
-        // --- BAT ---
-        g.clear();
-        g.fillStyle(0x303030); // Body
-        g.fillCircle(16, 16, 8);
-        g.beginPath(); // Wings
-        g.moveTo(8, 16);
-        g.lineTo(0, 8);
-        g.lineTo(8, 20);
-        g.moveTo(24, 16);
-        g.lineTo(32, 8);
-        g.lineTo(24, 20);
-        g.fillPath();
-        g.fillStyle(0xff0000); // Red eyes
-        g.fillRect(14, 14, 1, 1);
-        g.fillRect(17, 14, 1, 1);
-        g.generateTexture('mob_bat', 32, 32);
-
-        // --- GOBLIN ---
-        g.clear();
-        g.fillStyle(0x2e7d32); // Skin
-        g.fillRect(10, 8, 12, 10); // Head
-        g.fillRect(8, 18, 16, 14); // Body
-        g.fillStyle(0x558b2f); // Ears
-        g.fillTriangle(10, 12, 4, 8, 10, 16);
-        g.fillTriangle(22, 12, 28, 8, 22, 16);
-        g.fillStyle(0xffffff); // Eyes
-        g.fillRect(12, 10, 3, 3);
-        g.fillRect(17, 10, 3, 3);
-        g.fillStyle(0x000000); // Pupils
-        g.fillRect(13, 11, 1, 1);
-        g.fillRect(18, 11, 1, 1);
-        g.generateTexture('mob_goblin', 32, 32);
-
-        g.destroy();
+        // Goblin (using void boss palette temporarily or generic green?)
+        // Let's make a manual goblin palette if needed, or re-use slime palette variant
+        // For now, void_wisp uses mob_bat or standard boss texture
     }
 
     createBossTexture() {
-        const g = this.make.graphics({ x: 0, y: 0, add: false });
+        // Bosses get larger scale (4x = 64x64)
+        this.createPixelTexture('boss_void', SPRITES.boss_void, PALETTES.boss_void, 4);
 
-        // --- BOSS (Improved) ---
-        // Dark Aura
-        g.fillStyle(0x1a0033);
-        g.fillCircle(32, 32, 30);
-
-        // Spikes
-        g.fillStyle(0x4a148c);
-        for (let i = 0; i < 8; i++) {
-            const angle = (i / 8) * Math.PI * 2;
-            const x = 32 + Math.cos(angle) * 32;
-            const y = 32 + Math.sin(angle) * 32;
-            g.fillCircle(x, y, 6);
-        }
-
-        // Core
-        g.fillStyle(0xff0000);
-        g.fillCircle(32, 32, 15);
-        g.fillStyle(0xffa0a0);
-        g.fillCircle(28, 28, 5); // Shine
-
-        // Evil Eyes
-        g.fillStyle(0xffff00);
-        g.beginPath();
-        g.moveTo(24, 28); g.lineTo(28, 32); g.lineTo(24, 34);
-        g.moveTo(40, 28); g.lineTo(36, 32); g.lineTo(40, 34);
-        g.fillPath();
-
-        g.generateTexture('boss', 64, 64);
-        g.destroy();
+        // Forest Guardian (Boar) - using same void grid but different palette? 
+        // Or create specific one. For now let's reuse void with green tint or better, add boar to PixelArt later.
+        // Actually, let's just use boss_void for all bosses but tint them, 
+        // OR rely on the separate textures if I added them to data. 
+        // GameData asks for 'boss'. Let's map 'boss' to 'boss_void'.
+        this.createPixelTexture('boss', SPRITES.boss_void, PALETTES.boss_void, 3); // Default boss
     }
 
     createBuildingTextures() {
