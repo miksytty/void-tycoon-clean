@@ -153,9 +153,11 @@ export const BOSSES = {
         speed: 90, // Fast but outrunnable
         detectionRange: 200,
         attackRange: 40,
-        dropChance: 0.3,
+        dropChance: 0.2,
         drops: ['dimension_key'],
         xpReward: 300,
+        crystalDropMin: 20,
+        crystalDropMax: 35,
         color: 0x4caf50,
         size: 1.5,
         spawnChance: 0.005,
@@ -173,6 +175,8 @@ export const BOSSES = {
         dropChance: 0.25,
         drops: ['dimension_key', 'steel'],
         xpReward: 800,
+        crystalDropMin: 30,
+        crystalDropMax: 50,
         color: 0x607d8b,
         size: 2.0,
         spawnChance: 0.003,
@@ -190,6 +194,8 @@ export const BOSSES = {
         dropChance: 1.0, // Guaranteed drop
         drops: ['dimension_key', 'quantum'],
         xpReward: 5000,
+        crystalDropMin: 50,
+        crystalDropMax: 100,
         color: 0x9c27b0,
         size: 3.0,
         spawnChance: 0.001,
@@ -435,7 +441,7 @@ export const QUEST_TEMPLATES = [
     { id: 'craft_any', name: 'Крафтер', description: 'Скрафти 3 предмета', icon: '⚒️', target: 3, trackStat: 'dailyCrafts', reward: { stars: 3 } },
     { id: 'play_time', name: 'Игроман', description: 'Играй 10 минут', icon: '⏱️', target: 600, trackStat: 'sessionTime', reward: { stars: 2 } }
 ];
- 
+
 
 export const BUILDINGS = {
     lumber_mill: {

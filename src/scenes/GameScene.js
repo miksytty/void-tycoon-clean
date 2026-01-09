@@ -611,8 +611,13 @@ export class GameScene extends Phaser.Scene {
             const boss = new Boss(this, spawnX, spawnY, bossConfig);
             this.bosses.push(boss);
 
+            // Dramatic boss spawn announcement
             this.showFloatingText(spawnX, spawnY - 50, `${bossConfig.icon} ${bossConfig.name}!`, bossConfig.color);
-            window.VoidTycoon.ui?.showNotification(`⚠️ ${bossConfig.name} появился!`, 'error');
+            window.VoidTycoon.ui?.showNotification(`⚠️ Проснулся древний страж Пустоты!`, 'error');
+
+            // Camera effect
+            this.cameras.main.shake(300, 0.005);
+            window.VoidTycoon.telegram?.hapticFeedback('heavy');
 
             return; // Only one spawn per cycle
         }

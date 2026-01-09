@@ -58,6 +58,15 @@ export const QUESTS = {
         type: 'gather',
         target: { resource: 'crystal', amount: 5 },
         reward: { xp: 200, iron: 30 }
+    },
+    boss_slayer: {
+        id: 'boss_slayer',
+        name: 'Победитель Стража',
+        description: 'Победи первого босса',
+        icon: '💀',
+        type: 'boss_kill',
+        target: { amount: 1 },
+        reward: { xp: 500, crystal: 25, dimension_key: 1 }
     }
 };
 
@@ -137,6 +146,9 @@ export class QuestManager {
                 case 'kill':
                     shouldProgress = true;
                     break;
+                case 'boss_kill':
+                    shouldProgress = true;
+                    break;
             }
 
             if (shouldProgress) {
@@ -199,7 +211,8 @@ export class QuestManager {
             'first_steps': 'builder',
             'builder': 'iron_miner',
             'gatherer_50': 'hunter',
-            'hunter': 'crystal_hunter'
+            'hunter': 'crystal_hunter',
+            'crystal_hunter': 'boss_slayer'
         };
 
         const nextQuestId = questChain[completedQuestId];
