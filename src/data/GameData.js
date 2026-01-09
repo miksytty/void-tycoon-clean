@@ -232,6 +232,10 @@ export const MOBS = {
         spawnChance: 0.02,
         minDistanceFromSpawn: 1500
     },
+    size: 0.6,
+    spawnChance: 0.02,
+    minDistanceFromSpawn: 1500
+},
     void_wisp: { // NEW MOB for Crystal Zone
         id: 'void_wisp',
         name: 'Р”СѓС… РџСѓСЃС‚РѕС‚С‹',
@@ -490,3 +494,49 @@ export const QUEST_TEMPLATES = [
     { id: 'craft_any', name: 'РљСЂР°С„С‚РµСЂ', description: 'РЎРєСЂР°С„С‚Рё 3 РїСЂРµРґРјРµС‚Р°', icon: 'вљ’пёЏ', target: 3, trackStat: 'dailyCrafts', reward: { stars: 3 } },
     { id: 'play_time', name: 'РРіСЂРѕРјР°РЅ', description: 'РРіСЂР°Р№ 10 РјРёРЅСѓС‚', icon: 'вЏ±пёЏ', target: 600, trackStat: 'sessionTime', reward: { stars: 2 } }
 ];
+ 
+export const BUILDINGS = {
+    lumber_mill: {
+        id: 'lumber_mill',
+        name: 'Лесопилка',
+        icon: '??',
+        description: 'Автоматически добывает Дерево.',
+        cost: { wood: 100 },
+        production: { wood: 5 }, // +5 per minute
+        productionInterval: 60000,
+        size: 2, // 2x2 tiles (approx 64x64)
+        color: 0x8d6e63
+    },
+    quarry: {
+        id: 'quarry',
+        name: 'Шахта',
+        icon: '??',
+        description: 'Автоматически добывает Камень.',
+        cost: { wood: 50, iron: 50 },
+        production: { iron: 3 }, // +3 per minute
+        productionInterval: 60000,
+        size: 2,
+        color: 0x78909c
+    },
+    smelter: {
+        id: 'smelter',
+        name: 'Плавильня',
+        icon: '??',
+        description: 'Переплавляет руду в слитки.',
+        cost: { wood: 200, iron: 100 },
+        production: {}, // Process based
+        size: 2,
+        color: 0xe64a19
+    },
+    portal: {
+        id: 'portal',
+        name: 'Портал Измерений',
+        icon: '??',
+        description: 'Путь домой. Требует Ключи.',
+        cost: { wood: 1000, steel: 500, crystal: 50, dimension_key: 1 },
+        production: {},
+        size: 3,
+        color: 0x9c27b0
+    }
+};
+

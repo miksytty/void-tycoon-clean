@@ -67,7 +67,7 @@ export class StorageManager {
                 vibrationEnabled: true,
                 tutorialComplete: false
             },
-            buildings: {
+            buildings: { // Legacy counts, maybe keep for stats?
                 lumber_mill: 0,
                 quarry: 0,
                 crystal_mine: 0,
@@ -76,6 +76,7 @@ export class StorageManager {
                 portal: 0,
                 turret: 0
             },
+            placedBuildings: [], // Array of { id, type, x, y, lastProduction }
             skills: {
                 speed: 0,
                 efficiency: 0,
