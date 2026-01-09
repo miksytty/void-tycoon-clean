@@ -238,7 +238,9 @@ export class QuestManager {
         }
 
         storage.save();
-        window.VoidTycoon.ui?.updateHUD();
+        // Update HUD via scene
+        const scene = window.VoidTycoon.game?.scene?.getScene('GameScene');
+        scene?.updateHUD();
     }
 
     getXPForLevel(level) {

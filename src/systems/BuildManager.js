@@ -225,7 +225,9 @@ export class BuildManager {
 
         if (hasGain) {
             storage.save();
-            window.VoidTycoon.ui?.updateHUD();
+            // Update HUD via scene
+            const scene = window.VoidTycoon.game?.scene?.getScene('GameScene');
+            scene?.updateHUD();
         }
     }
 }
