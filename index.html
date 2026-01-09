@@ -215,7 +215,13 @@
         </div>
 
         <div id="referrals-stats">
-          <p style="opacity: 0.6;">Приглашай друзей, чтобы доминировать в рейтинге!</p>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding: 0 5px;">
+            <span style="opacity: 0.8;">Приглашено:</span>
+            <span id="friends-count-badge" style="font-weight: bold; color: #00ffff;">0</span>
+          </div>
+          <div id="referrals-list" style="max-height: 200px; overflow-y: auto; text-align: left;">
+            <!-- Friends will appear here -->
+          </div>
         </div>
       </div>
     </div>

@@ -177,6 +177,7 @@ export class UIManager {
         // Friends & Referral
         document.getElementById('btn-friends')?.addEventListener('click', () => {
             this.openModal('friends');
+            this.renderFriends();
         });
 
         document.getElementById('btn-invite-friend')?.addEventListener('click', () => {
@@ -2116,6 +2117,46 @@ export class UIManager {
             `;
 
             container.appendChild(item);
+        });
+    }
+
+    async renderFriends() {
+        const list = document.getElementById('referrals-list');
+        if (!list) return;
+
+        list.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">⏳ Загрузка друзей...</div>';
+
+        const friends = await window.VoidTycoon.social?.getReferrals() || [];
+
+        list.innerHTML = '';
+        const countEl = document.getElementById('friends-count-badge');
+        if (countEl) countEl.textContent = friends.length;
+
+        if (friends.length === 0) {
+            list.innerHTML = `
+                <div style="text-align:center; padding:20px; opacity:0.6;">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">🤷‍♂️</div>
+                    Пока никого...<br>Отправь ссылку друзьям!
+                </div>`;
+            return;
+        }
+
+        friends.forEach(f => {
+            const item = document.createElement('div');
+            item.style.cssText = `
+                display: flex; justify-content: space-between; align-items: center;
+                background: rgba(255, 255, 255, 0.05);
+                padding: 10px 14px; border-radius: 8px; margin-bottom: 6px;
+                border: 1px solid rgba(255,255,255,0.05);
+            `;
+            item.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1.2rem;">👤</span>
+                    <span style="color: #eee; font-weight: 500;">${f.username}</span>
+                </div>
+                <span style="color: #888; font-size: 0.8rem;">${f.date}</span>
+            `;
+            list.appendChild(item);
         });
     }
 
