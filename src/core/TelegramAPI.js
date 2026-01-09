@@ -164,15 +164,20 @@ export class TelegramAPI {
         return `https://t.me/${botUsername}?startattach=invoice_${params.payload}`;
     }
 
+    getStartParam() {
+        return this.webapp?.initDataUnsafe?.start_param || null;
+    }
+
     generateReferralLink() {
         const userId = this.getUserId();
-        const botUsername = 'VoidTycoonBot';
-        return `https://t.me/${botUsername}?start=ref_${userId}`;
+        const botUsername = 'void_tycoon_game_bot';
+        const appName = 'game';
+        return `https://t.me/${botUsername}/${appName}?startapp=${userId}`;
     }
 
     shareReferralLink() {
         const link = this.generateReferralLink();
-        const text = '🎮 Join Void Tycoon! Gather, craft and become a tycoon! 🚀';
+        const text = 'Помоги мне выбраться из Пустоты в Void Tycoon! Получи 100 кристаллов на старте! 💎';
 
         if (this.webapp) {
             const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`;

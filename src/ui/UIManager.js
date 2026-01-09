@@ -174,6 +174,15 @@ export class UIManager {
             this.renderRanking();
         });
 
+        // Friends & Referral
+        document.getElementById('btn-friends')?.addEventListener('click', () => {
+            this.openModal('friends');
+        });
+
+        document.getElementById('btn-invite-friend')?.addEventListener('click', () => {
+            window.VoidTycoon.social?.inviteFriends();
+        });
+
         // Строительство (New Button Handler)
         document.getElementById('btn-build')?.addEventListener('click', () => {
             this.openModal('inventory');

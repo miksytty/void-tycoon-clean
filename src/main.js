@@ -12,6 +12,7 @@ import { LocalizationManager } from './systems/LocalizationManager.js';
 import { leaderboardAPI } from './core/SupabaseClient.js';
 import { initSecurity } from './systems/Security.js';
 import { AudioManager } from './core/AudioManager.js';
+import { SocialManager } from './core/SocialManager.js';
 
 // Initialize global managers
 import './styles/premium-effects.css'; // 🎨 Premium Visual Effects
@@ -25,6 +26,7 @@ window.VoidTycoon = {
     ads: new AdsManager('20849'), // Production Block ID
     localization: new LocalizationManager(),
     audio: new AudioManager(), // New robust audio
+    social: new SocialManager(), // Referral & Socials
     leaderboard: leaderboardAPI,
     game: null
 };
@@ -45,6 +47,9 @@ async function initApp() {
         window.VoidTycoon.ui = new UIManager();
         window.VoidTycoon.tutorial = new TutorialManager();
         window.VoidTycoon.dailyRewards = new DailyRewardsManager();
+
+        // Init Social Manager (Referrals)
+        window.VoidTycoon.social.init();
 
         const config = {
             type: Phaser.AUTO,

@@ -93,6 +93,7 @@
       <!-- Smelter button removed - simplified gameplay -->
       <button id="btn-skills" class="action-btn">🎓</button>
       <button id="btn-research" class="action-btn">🧪</button>
+      <button id="btn-friends" class="action-btn">👥</button>
       <button id="btn-settings" class="action-btn">⚙️</button>
     </div>
   </div>
@@ -174,6 +175,31 @@
           <span>Вы</span>
         </div>
         <span style="font-weight: bold; color: #ffd700;">0 XP</span>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div id="friends-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>👥 Друзья</h2>
+        <button class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body" style="text-align: center;">
+        <div
+          style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1);">
+          <p style="font-size: 1.1em; margin-bottom: 10px;">Пригласи друга и получи <b style="color:#00ffff;">100
+              💎</b>!</p>
+          <p style="font-size: 0.9em; opacity: 0.7; margin-bottom: 15px;">Твой друг также получит 100 💎 бонуса.</p>
+          <button id="btn-invite-friend" class="primary-btn pulse"
+            style="width: 100%; padding: 12px; font-size: 1.1em; background: linear-gradient(45deg, #6c5ce7, #a29bfe); border: none; border-radius: 8px; color: white; cursor: pointer;">📤
+            Пригласить</button>
+        </div>
+
+        <div id="referrals-stats">
+          <p style="opacity: 0.6;">Приглашай друзей, чтобы доминировать в рейтинге!</p>
+        </div>
       </div>
     </div>
   </div>
