@@ -118,54 +118,54 @@ export class StorageManager {
         const now = Date.now();
         const elapsedMs = now - lastOnline;
 
-        const MIN_OFFLINE = 60 * 1000;
-        const MAX_OFFLINE = 8 * 60 * 60 * 1000;
+        const MIN_OFFLINE = 60 * 1000; // 1 minute minimum
+        const MAX_OFFLINE = 8 * 60 * 60 * 1000; // 8 hours max
 
         if (elapsedMs < MIN_OFFLINE) return null;
 
         const cappedMs = Math.min(elapsedMs, MAX_OFFLINE);
         const seconds = Math.floor(cappedMs / 1000);
 
-        const ownedBuildings = this.data.buildings || {};
+        // Use placedBuildings instead of legacy buildings count
+        const placedBuildings = this.data.placedBuildings || [];
         const earnings = {};
         let hasEarnings = false;
 
-        for (const [id, count] of Object.entries(ownedBuildings)) {
-            if (count > 0 && BUILDINGS[id]) {
-                const production = BUILDINGS[id].production || {};
+        for (const building of placedBuildings) {
+            const config = BUILDINGS[building.type];
+            if (!config || !config.production) continue;
 
-                for (const [res, perSecond] of Object.entries(production)) {
-                    const amount = perSecond * count * seconds;
-                    if (amount > 0) {
-                        earnings[res] = (earnings[res] || 0) + amount;
-                        hasEarnings = true;
-                    }
+            // Production is per minute in config, convert to per second
+            const productionInterval = config.productionInterval || 60000;
+            const cyclesCompleted = Math.floor((seconds * 1000) / productionInterval);
+
+            for (const [res, amountPerCycle] of Object.entries(config.production)) {
+                const amount = amountPerCycle * cyclesCompleted;
+                if (amount > 0) {
+                    earnings[res] = (earnings[res] || 0) + amount;
+                    hasEarnings = true;
                 }
             }
         }
 
-        // Offline Processing Logic
+        // Offline Processing Logic (keep existing)
         if (this.data.processingQueue && this.data.processingQueue.length > 0) {
             this.data.processingQueue.forEach(job => {
                 if (!job.completed) {
                     const jobElapsed = now - job.startTime;
                     if (jobElapsed >= job.duration) {
                         job.completed = true;
-                        hasEarnings = true; // Mark as having something to notify (though this is structural return)
+                        hasEarnings = true;
                     }
                 }
             });
         }
 
+        // Don't auto-apply earnings - let UI handle it with claim button
         if (hasEarnings) {
-            for (const [res, amount] of Object.entries(earnings)) {
-                this.data.resources[res] = (this.data.resources[res] || 0) + Math.floor(amount);
-            }
-
             this.data.stats.lastOnlineTime = now;
             this.save();
-
-            return { earnings: earnings, seconds: seconds };
+            return { earnings: earnings, seconds: seconds, pending: true };
         }
 
         this.data.stats.lastOnlineTime = now;

@@ -757,17 +757,21 @@ export class UIManager {
     }
 
     /**
-     * Показ оффлайн-дохода
+     * Показ оффлайн-дохода с кнопками "Забрать" и "Удвоить"
      */
     showWelcomeBack() {
         const storage = window.VoidTycoon.storage;
-        const earnings = storage?.offlineEarnings;
+        const earningsData = storage?.offlineEarnings;
 
-        if (!earnings) return;
+        if (!earningsData || !earningsData.pending) return;
 
-        const { earnings: resources, seconds } = earnings;
+        const { earnings: resources, seconds } = earningsData;
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
+
+        // Проверяем есть ли реальные ресурсы
+        const hasResources = Object.values(resources).some(amt => amt > 0);
+        if (!hasResources) return;
 
         // Форматируем время
         let timeStr = '';
@@ -792,35 +796,69 @@ export class UIManager {
         // Создаём попап
         const overlay = document.createElement('div');
         overlay.className = 'welcome-overlay';
+        overlay.id = 'welcome-back-overlay';
         overlay.style.cssText = `
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); z-index: 9998;
+            background: rgba(0,0,0,0.9); z-index: 9998;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             color: white; text-align: center; animation: fadeIn 0.5s;
         `;
 
         overlay.innerHTML = `
             <div style="font-size: 3rem; margin-bottom: 10px;">👋</div>
-            <h2 style="margin: 10px 0; color: #a29bfe;">С возвращением!</h2>
+            <h2 style="margin: 10px 0; color: #a29bfe; font-size: 1.8rem;">С возвращением!</h2>
             <p style="color: #888; margin-bottom: 20px;">Ты отсутствовал ${timeStr}</p>
             <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; min-width: 200px;">
                 <div style="font-size: 0.9rem; color: #888; margin-bottom: 10px;">Твои здания заработали:</div>
                 ${resourcesHtml}
             </div>
-            <button id="welcome-close" style="margin-top: 30px; padding: 15px 40px; background: #6c5ce7; border: none; border-radius: 30px; color: white; font-size: 1rem; cursor: pointer;">
-                🎉 Забрать
-            </button>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 25px;">
+                <button id="welcome-double" style="padding: 15px 40px; background: linear-gradient(45deg, #f39c12, #e74c3c); border: none; border-radius: 30px; color: white; font-size: 1rem; cursor: pointer; font-weight: bold;">
+                    🎬 Удвоить за рекламу (x2)
+                </button>
+                <button id="welcome-claim" style="padding: 15px 40px; background: #6c5ce7; border: none; border-radius: 30px; color: white; font-size: 1rem; cursor: pointer;">
+                    🎉 Забрать
+                </button>
+            </div>
         `;
 
         document.body.appendChild(overlay);
         window.VoidTycoon.sound?.playSuccess();
         window.VoidTycoon.telegram?.hapticFeedback('success');
 
-        document.getElementById('welcome-close').addEventListener('click', () => {
+        // Функция применения ресурсов
+        const applyResources = (multiplier = 1) => {
+            for (const [res, amount] of Object.entries(resources)) {
+                const finalAmount = Math.floor(amount * multiplier);
+                storage.addResource(res, finalAmount);
+            }
+            storage.save();
+
             overlay.remove();
+            this.showNotification(multiplier > 1 ? '🎉 Ресурсы удвоены!' : '🎉 Ресурсы получены!', 'success');
+
             // Обновляем HUD
             const scene = window.VoidTycoon.game?.scene?.getScene('GameScene');
             scene?.updateHUD();
+        };
+
+        // Кнопка обычного забора
+        document.getElementById('welcome-claim').addEventListener('click', () => {
+            applyResources(1);
+        });
+
+        // Кнопка удвоения за рекламу
+        document.getElementById('welcome-double').addEventListener('click', () => {
+            const ads = window.VoidTycoon.ads;
+            if (ads && ads.showRewardedAd) {
+                ads.showRewardedAd(() => {
+                    applyResources(2);
+                });
+            } else {
+                // Fallback если реклама недоступна
+                this.showNotification('Реклама недоступна', 'error');
+                applyResources(1);
+            }
         });
     }
 
