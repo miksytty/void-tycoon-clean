@@ -399,7 +399,7 @@ export class StorageManager {
             }, 500);
 
             window.VoidTycoon.telegram?.hapticFeedback('success');
-            window.VoidTycoon.sound?.playLevelUp();
+            window.VoidTycoon.audio?.playSFX('levelup');
         }
 
         this.save();

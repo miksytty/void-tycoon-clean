@@ -457,12 +457,7 @@ export class GameScene extends Phaser.Scene {
 
         this.cameras.main.shake(100, 0.005);
 
-        const sounds = {
-            tree: 'playWoodChop',
-            rock: 'playRockHit',
-            crystal: 'playCrystalChime'
-        };
-        if (sounds[resourceType]) window.VoidTycoon.sound?.[sounds[resourceType]]?.();
+        // Audio legacy cleanup
 
         this.showFloatingText(this.currentResource.x, this.currentResource.y, `+${amount} ${RESOURCES[reward.type].icon}`, 0x00ff00);
         this.showFloatingText(this.player.x, this.player.y - 40, `+${reward.xp} XP`, 0xffd700);

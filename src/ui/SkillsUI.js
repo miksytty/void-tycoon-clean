@@ -103,7 +103,7 @@ export class SkillsUI {
                 storage.data.player.maxEnergy += skill.effect.value;
             }
 
-            window.VoidTycoon.sound?.playLevelUp();
+            window.VoidTycoon.audio?.playSFX('levelup');
             window.VoidTycoon.telegram?.hapticFeedback('success');
 
             // Re-render

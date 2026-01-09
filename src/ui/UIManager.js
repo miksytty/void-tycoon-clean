@@ -317,7 +317,7 @@ export class UIManager {
         modal.classList.remove('hidden');
         window.VoidTycoon.telegram?.showBackButton();
         window.VoidTycoon.telegram?.hapticFeedback('light');
-        window.VoidTycoon.sound?.playClick();
+        window.VoidTycoon.audio?.playSFX('click');
 
         // Обновление содержимого
         if (modalId === 'inventory') {
@@ -441,7 +441,7 @@ export class UIManager {
             if (!isEquipped) {
                 if (storage.equipItem(item.id, item.slot || (item.type === 'pet' ? 'pet' : 'backpack'))) {
                     this.showNotification(`⚔️ ${item.name} экипирован!`, 'success');
-                    window.VoidTycoon.sound?.playSuccess();
+                    window.VoidTycoon.audio?.playSFX('collect');
                     this.renderInventory();
                 }
             } else {
@@ -584,7 +584,7 @@ export class UIManager {
         // Уведомление
         this.showNotification(`✨ Создано: ${recipe.result.name}!`, 'success');
         window.VoidTycoon.telegram?.hapticFeedback('success');
-        window.VoidTycoon.sound?.playSuccess();
+        window.VoidTycoon.audio?.playSFX('collect');
 
         // Обновление UI
         this.renderCrafting();
@@ -743,7 +743,7 @@ export class UIManager {
         }
 
         this.showNotification(`🏗️ ${BUILDINGS[buildingId].name} улучшено!`, 'success');
-        window.VoidTycoon.sound?.playLevelUp();
+        window.VoidTycoon.audio?.playSFX('levelup');
         window.VoidTycoon.telegram?.hapticFeedback('success');
 
         this.renderBuildings();
@@ -788,7 +788,7 @@ export class UIManager {
         `;
 
         document.body.appendChild(overlay);
-        window.VoidTycoon.sound?.playLevelUp();
+        window.VoidTycoon.audio?.playSFX('levelup');
 
         document.getElementById('win-reload').addEventListener('click', () => {
 
@@ -864,7 +864,7 @@ export class UIManager {
         `;
 
         document.body.appendChild(overlay);
-        window.VoidTycoon.sound?.playSuccess();
+        window.VoidTycoon.audio?.playSFX('collect');
         window.VoidTycoon.telegram?.hapticFeedback('success');
 
         // Функция применения ресурсов
@@ -1191,7 +1191,7 @@ export class UIManager {
 
         if (storage.unlockTechnology(tech.id)) {
             this.showNotification(`🧪 ${tech.name} изучено!`, 'success');
-            window.VoidTycoon.sound?.playLevelUp();
+            window.VoidTycoon.audio?.playSFX('levelup');
             window.VoidTycoon.telegram?.hapticFeedback('success');
 
             // Если технология дает эффект для игрока (например +инвентарь), применяем сразу если нужно?
@@ -1275,7 +1275,7 @@ export class UIManager {
                 if (isDone) {
                     jobEl.querySelector('.claim-btn').addEventListener('click', () => {
                         if (storage.claimProcessedItem(job.id)) {
-                            window.VoidTycoon.sound?.playSuccess();
+                            window.VoidTycoon.audio?.playSFX('collect');
                             this.renderSmelter();
                             const scene = window.VoidTycoon.game?.scene?.getScene('GameScene');
                             scene?.updateHUD();
@@ -1396,7 +1396,8 @@ export class UIManager {
             window.VoidTycoon.storage.data.settings.soundEnabled = enabled;
             window.VoidTycoon.storage.save();
             // Adjust master volume (0.5 when enabled, 0 when disabled)
-            window.VoidTycoon.sound.setMasterVolume(enabled ? 0.5 : 0);
+            window.VoidTycoon.audio.volume = enabled ? 0.5 : 0;
+            window.VoidTycoon.audio.saveSettings();
         });
 
         // Музыка
@@ -1405,9 +1406,9 @@ export class UIManager {
             window.VoidTycoon.storage.data.settings.musicEnabled = enabled;
             window.VoidTycoon.storage.save();
             if (enabled) {
-                window.VoidTycoon.sound.startAmbientMusic();
+                window.VoidTycoon.audio.playBGM();
             } else {
-                window.VoidTycoon.sound.stopAmbientMusic();
+                window.VoidTycoon.audio.stopBGM();
             }
         });
 
@@ -1554,7 +1555,7 @@ export class UIManager {
                 this.showNotification(`🏆 Достижение: ${ach.name}! +${ach.reward.stars}⭐`, 'success');
             });
 
-            window.VoidTycoon.sound?.playLevelUp();
+            window.VoidTycoon.audio?.playSFX('levelup');
             window.VoidTycoon.telegram?.hapticFeedback('success');
         }
     }
@@ -1637,7 +1638,7 @@ export class UIManager {
                     storage.data.quests[todayKey][`${questId}_claimed`] = true;
                     storage.save();
                     this.showNotification(`⭐ +${quest.reward.stars} Stars!`, 'success');
-                    window.VoidTycoon.sound?.playSuccess();
+                    window.VoidTycoon.audio?.playSFX('collect');
                     this.renderQuests();
                 }
             });
@@ -1899,7 +1900,7 @@ export class UIManager {
             overlay.remove();
         });
 
-        window.VoidTycoon.sound?.playSuccess();
+        window.VoidTycoon.audio?.playSFX('collect');
         window.VoidTycoon.telegram?.hapticFeedback('heavy');
     }
     // --- Dialog System ---

@@ -400,7 +400,7 @@ export class PortalManager {
         document.body.appendChild(overlay);
 
         window.VoidTycoon.telegram?.hapticFeedback('success');
-        window.VoidTycoon.sound?.playLevelUp();
+        window.VoidTycoon.audio?.playSFX('levelup');
     }
 
     // Check if player can see portal (level 10+)

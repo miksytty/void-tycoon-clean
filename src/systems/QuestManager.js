@@ -193,7 +193,7 @@ export class QuestManager {
         // Visual feedback
         window.VoidTycoon.ui?.showNotification(`✅ Квест выполнен: ${quest.name}!`, 'success');
         window.VoidTycoon.telegram?.hapticFeedback('success');
-        window.VoidTycoon.sound?.playLevelUp();
+        window.VoidTycoon.audio?.playSFX('levelup');
 
         // Particle effect at player
         const scene = window.VoidTycoon.game?.scene?.getScene('GameScene');
@@ -277,7 +277,7 @@ export class QuestManager {
         }
 
         window.VoidTycoon.ui?.showNotification(`🎉 LEVEL UP! Уровень ${newLevel}!`, 'success');
-        window.VoidTycoon.sound?.playLevelUp();
+        window.VoidTycoon.audio?.playSFX('levelup');
     }
 
     showLevelUpEffect(scene, x, y, level) {

@@ -141,7 +141,7 @@ export class BuildManager {
 
         storage.save();
         window.VoidTycoon.ui?.showNotification(`${config.name} построена!`, 'success');
-        window.VoidTycoon.sound?.playBuildSound?.();
+        window.VoidTycoon.audio?.playSFX('hit_wood');
 
         // Quest system - track building
         window.VoidTycoon.questManager?.updateProgress('build', { building: this.selectedBuildingId, amount: 1 });

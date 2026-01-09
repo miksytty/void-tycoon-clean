@@ -312,7 +312,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
         });
 
         window.VoidTycoon.telegram?.hapticFeedback('success');
-        window.VoidTycoon.sound?.playLevelUp();
+        window.VoidTycoon.audio?.playSFX('levelup');
     }
 
     createLootFountain(crystalAmount) {
