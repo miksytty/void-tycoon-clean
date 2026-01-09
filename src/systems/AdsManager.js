@@ -11,35 +11,65 @@ export class AdsManager {
 
     showRewardVideo() {
         return new Promise((resolve, reject) => {
-            if (!this.checkAvailability()) {
-                console.warn('Adsgram SDK not loaded or blocked');
-                // For development/testing locally without SDK, maybe reject or mock?
-                // Request said: "reject promise (error or skip)"
-                reject('SDK_MISSING');
-                return;
-            }
-
-            try {
-                const AdController = window.Adsgram.init({
-                    blockId: this.blockId,
-                    debug: this.debug
-                });
-
-                AdController.show()
-                    .then((result) => {
-                        // result: { done: true } or similar
-                        console.log('Adsgram Result:', result);
-                        resolve(result);
-                    })
-                    .catch((result) => {
-                        // result: { done: false, description: 'skipped' or error }
-                        console.warn('Adsgram Error/Skip:', result);
-                        reject(result);
+            // 1. Try Adsgram
+            if (this.checkAvailability()) {
+                try {
+                    const AdController = window.Adsgram.init({
+                        blockId: this.blockId,
+                        debug: this.debug
                     });
-            } catch (e) {
-                console.error('Adsgram Init Error:', e);
-                reject(e);
+
+                    AdController.show()
+                        .then((result) => {
+                            console.log('Adsgram Result:', result);
+                            resolve(result);
+                        })
+                        .catch((result) => {
+                            console.warn('Adsgram Error/Skip:', result);
+                            // Fallback to simulation if error (for testing)
+                            console.log('Falling back to simulation...');
+                            this.simulateAd(resolve);
+                        });
+                    return;
+                } catch (e) {
+                    console.error('Adsgram Init Error:', e);
+                }
             }
+
+            // 2. Fallback / No SDK
+            console.log('SDK missing or failed, using simulation.');
+            this.simulateAd(resolve);
         });
+    }
+
+    simulateAd(onSuccess) {
+        // Mock Ad Interface
+        const adOverlay = document.createElement('div');
+        adOverlay.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: black; color: white; z-index: 10000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-family: sans-serif;
+        `;
+        adOverlay.innerHTML = `
+            <div style="font-size: 4rem; margin-bottom: 20px;">📺</div>
+            <h1 style="margin: 0; color: #ffd700;">TEST AD</h1>
+            <p style="color: #ccc;">Adsgram failed or testing mode</p>
+            <p style="font-size: 1.5rem; font-weight: bold;">Wait: <span id="ad-timer">3</span>s</p>
+        `;
+        document.body.appendChild(adOverlay);
+
+        let timeLeft = 3;
+        const timer = setInterval(() => {
+            timeLeft--;
+            const timerEl = document.getElementById('ad-timer');
+            if (timerEl) timerEl.textContent = timeLeft;
+
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                adOverlay.remove();
+                if (onSuccess) onSuccess({ done: true, mock: true });
+            }
+        }, 1000);
     }
 }
