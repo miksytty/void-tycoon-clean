@@ -436,12 +436,13 @@ export const QUEST_TEMPLATES = [
     { id: 'play_time', name: 'Игроман', description: 'Играй 10 минут', icon: '⏱️', target: 600, trackStat: 'sessionTime', reward: { stars: 2 } }
 ];
  
+
 export const BUILDINGS = {
     lumber_mill: {
         id: 'lumber_mill',
-        name: '���������',
-        icon: '??',
-        description: '������������� �������� ������.',
+        name: 'Лесопилка',
+        icon: '🪚',
+        description: 'Автоматически добывает Дерево.',
         cost: { wood: 100 },
         production: { wood: 5 }, // +5 per minute
         productionInterval: 60000,
@@ -450,9 +451,9 @@ export const BUILDINGS = {
     },
     quarry: {
         id: 'quarry',
-        name: '�����',
-        icon: '??',
-        description: '������������� �������� ������.',
+        name: 'Шахта',
+        icon: '⛏️',
+        description: 'Автоматически добывает Камень.',
         cost: { wood: 50, iron: 50 },
         production: { iron: 3 }, // +3 per minute
         productionInterval: 60000,
@@ -461,9 +462,9 @@ export const BUILDINGS = {
     },
     smelter: {
         id: 'smelter',
-        name: '���������',
-        icon: '??',
-        description: '������������ ���� � ������.',
+        name: 'Плавильня',
+        icon: '🔥',
+        description: 'Переплавляет руду в слитки.',
         cost: { wood: 200, iron: 100 },
         production: {}, // Process based
         size: 2,
@@ -471,13 +472,12 @@ export const BUILDINGS = {
     },
     portal: {
         id: 'portal',
-        name: '������ ���������',
-        icon: '??',
-        description: '���� �����. ������� �����.',
+        name: 'Портал Измерений',
+        icon: '🌌',
+        description: 'Путь домой. Требует Ключи.',
         cost: { wood: 1000, steel: 500, crystal: 50, dimension_key: 1 },
         production: {},
         size: 3,
         color: 0x9c27b0
     }
 };
-
