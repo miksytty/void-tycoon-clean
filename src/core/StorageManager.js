@@ -62,6 +62,8 @@ export class StorageManager {
             technologies: [],
             processingQueue: [], // Array of { id, recipeId, startTime, duration, completed }
             quests: {},
+            completedQuests: [], // Quest system
+            questProgress: {},   // Quest progress tracking
             settings: {
                 soundEnabled: true,
                 vibrationEnabled: true,

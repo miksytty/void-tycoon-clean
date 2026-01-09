@@ -143,6 +143,9 @@ export class BuildManager {
         window.VoidTycoon.ui?.showNotification(`${config.name} построена!`, 'success');
         window.VoidTycoon.sound?.playBuildSound?.();
 
+        // Quest system - track building
+        window.VoidTycoon.questManager?.updateProgress('build', { building: this.selectedBuildingId, amount: 1 });
+
         // Exit build mode after one placement? Or keep it? Let's exit for mobile friendliness.
         this.exitBuildMode();
     }

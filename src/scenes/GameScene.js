@@ -8,6 +8,7 @@ import { VirtualJoystick } from '../ui/VirtualJoystick.js';
 // Turret removed - simplified gameplay
 import { Pet } from '../entities/Pet.js';
 import { BuildManager } from '../systems/BuildManager.js';
+import { QuestManager } from '../systems/QuestManager.js';
 
 export class GameScene extends Phaser.Scene {
     constructor() {
@@ -62,6 +63,11 @@ export class GameScene extends Phaser.Scene {
         this.buildManager = new BuildManager(this);
         this.buildManager.init();
         window.VoidTycoon.buildManager = this.buildManager; // Expose globally for UI
+
+        // Quest Manager
+        this.questManager = new QuestManager();
+        this.questManager.init();
+        window.VoidTycoon.questManager = this.questManager;
 
         // loadBuiltTurrets removed - turrets disabled
         this.checkPetSpawn();
@@ -409,6 +415,10 @@ export class GameScene extends Phaser.Scene {
 
         window.VoidTycoon.ui?.checkAchievements();
         window.VoidTycoon.ui?.trackQuestProgress('resource', reward.type, amount);
+
+        // Quest system integration
+        window.VoidTycoon.questManager?.updateProgress('gather', { resource: reward.type, amount: amount });
+        window.VoidTycoon.questManager?.updateProgress('gather_total', { amount: amount });
 
         if (this.resourceManager.createParticleEffect) {
             this.resourceManager.createParticleEffect(

@@ -144,6 +144,9 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
 
             storage.data.stats.bossesKilled = (storage.data.stats.bossesKilled || 0) + 1;
             storage.save();
+
+            // Quest system - track kills
+            window.VoidTycoon.questManager?.updateProgress('kill', { amount: 1 });
         }
 
         this.scene.tweens.add({

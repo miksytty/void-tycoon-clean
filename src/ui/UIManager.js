@@ -154,6 +154,11 @@ export class UIManager {
             const btn = document.querySelector('.tab-btn[data-tab="buildings"]');
             if (btn) btn.click();
         });
+
+        // Квесты
+        document.getElementById('btn-quests')?.addEventListener('click', () => {
+            this.showQuestsModal();
+        });
     }
 
     /**
@@ -1911,5 +1916,108 @@ export class UIManager {
             scene?.showTutorialArrow();
             this.tutorialArrowShown = true;
         }
+    }
+
+    /**
+     * Показ модального окна квестов
+     */
+    showQuestsModal() {
+        const questManager = window.VoidTycoon.questManager;
+        if (!questManager) {
+            this.showNotification('Система квестов не загружена', 'error');
+            return;
+        }
+
+        const activeQuests = questManager.getActiveQuests();
+        const completedCount = questManager.getCompletedCount();
+        const totalCount = questManager.getTotalCount();
+        const storage = window.VoidTycoon.storage;
+        const playerLevel = storage.data.player.level;
+        const playerXP = storage.data.player.xp;
+        const xpNeeded = questManager.getXPForLevel(playerLevel + 1);
+
+        // Build quests HTML
+        let questsHtml = '';
+        if (activeQuests.length === 0) {
+            questsHtml = '<div style="text-align:center; color:#888; padding:20px;">🎉 Все квесты выполнены!</div>';
+        } else {
+            activeQuests.forEach(quest => {
+                const progressPercent = Math.min(100, (quest.progress / quest.targetAmount) * 100);
+                const rewardHtml = Object.entries(quest.reward).map(([key, val]) => {
+                    if (key === 'xp') return `<span style="color:#ffd700">+${val} XP</span>`;
+                    return `<span style="color:#4cd137">+${val} ${key}</span>`;
+                }).join(' ');
+
+                questsHtml += `
+                    <div style="background:rgba(255,255,255,0.05); border-radius:10px; padding:15px; margin-bottom:10px;">
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                            <span style="font-size:1.5rem;">${quest.icon}</span>
+                            <div>
+                                <div style="font-weight:bold; color:#fff;">${quest.name}</div>
+                                <div style="font-size:0.85rem; color:#888;">${quest.description}</div>
+                            </div>
+                        </div>
+                        <div style="background:rgba(0,0,0,0.3); border-radius:5px; height:20px; overflow:hidden; margin-bottom:5px;">
+                            <div style="background:linear-gradient(90deg, #6c5ce7, #a29bfe); height:100%; width:${progressPercent}%; transition:width 0.3s;"></div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+                            <span style="color:#aaa;">${quest.progress}/${quest.targetAmount}</span>
+                            <span>${rewardHtml}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Create modal overlay
+        const overlay = document.createElement('div');
+        overlay.id = 'quests-modal-overlay';
+        overlay.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 9998;
+            display: flex; flex-direction: column; 
+            justify-content: flex-start; align-items: center;
+            padding-top: 60px;
+            color: white; overflow-y: auto;
+        `;
+
+        overlay.innerHTML = `
+            <div style="width:90%; max-width:400px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h2 style="margin:0; color:#a29bfe; font-size:1.5rem;">📜 Квесты</h2>
+                    <button id="quests-close" style="background:none; border:none; color:#fff; font-size:1.5rem; cursor:pointer;">✕</button>
+                </div>
+                
+                <!-- Player Level -->
+                <div style="background:rgba(108,92,231,0.3); border-radius:12px; padding:15px; margin-bottom:20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span style="font-size:1.2rem; font-weight:bold;">🎖️ Уровень ${playerLevel}</span>
+                        <span style="color:#ffd700;">${playerXP}/${xpNeeded} XP</span>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.3); border-radius:5px; height:10px; overflow:hidden;">
+                        <div style="background:#ffd700; height:100%; width:${(playerXP / xpNeeded) * 100}%;"></div>
+                    </div>
+                </div>
+
+                <!-- Completed Counter -->
+                <div style="text-align:center; margin-bottom:15px; color:#888;">
+                    Выполнено: ${completedCount}/${totalCount}
+                </div>
+
+                <!-- Quest List -->
+                ${questsHtml}
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        document.getElementById('quests-close').addEventListener('click', () => {
+            overlay.remove();
+        });
+
+        // Close on overlay click
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) overlay.remove();
+        });
     }
 }
