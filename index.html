@@ -82,8 +82,7 @@
       <button id="btn-shop" class="action-btn">🏪</button>
       <button id="btn-quests" class="action-btn">📋</button>
       <button id="btn-achievements" class="action-btn">🏆</button>
-      <button id="btn-ranking" class="action-btn"
-        style="display:none;">👑</button><!-- Hidden until leaderboard fixed -->
+      <button id="btn-ranking" class="action-btn">👑</button>
       <!-- Smelter button removed - simplified gameplay -->
       <button id="btn-skills" class="action-btn">🎓</button>
       <button id="btn-research" class="action-btn">🧪</button>
@@ -168,6 +167,18 @@
           <span>Вы</span>
         </div>
         <span style="font-weight: bold; color: #ffd700;">0 XP</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="ranking-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>👑 Лидерборд</h2>
+        <button class="close-btn">&times;</button>
+      </div>
+      <div id="ranking-list" class="ranking-container">
+        <div style="text-align:center; padding: 20px; color: #888;">⏳ Загрузка...</div>
       </div>
     </div>
   </div>
