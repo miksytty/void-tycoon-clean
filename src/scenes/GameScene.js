@@ -616,10 +616,7 @@ export class GameScene extends Phaser.Scene {
             this.lastBossSpawnCheck = time;
         }
 
-        // Update Quest Manager
-        if (this.questManager) {
-            this.questManager.update(time, delta);
-        }
+        // QuestManager updates via events, not polling
 
         // Dust effect when moving
         if (this.player && this.player.body && this.player.body.velocity.lengthSq() > 100) {
